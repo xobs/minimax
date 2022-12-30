@@ -69,139 +69,12 @@ module minimax (
   reg op16_slli_thunk;
   reg op32;
   wire [15:0] inst_type_masked;
-  wire n66_o;
-  wire n67_o;
-  wire [15:0] n71_o;
-  wire n72_o;
-  wire n73_o;
-  wire n74_o;
-  wire [15:0] n77_o;
-  wire n78_o;
-  wire n79_o;
-  wire n80_o;
-  wire [15:0] n83_o;
-  wire n84_o;
-  wire n85_o;
-  wire n86_o;
-  wire [15:0] n89_o;
-  wire n90_o;
-  wire n91_o;
-  wire n92_o;
-  wire [15:0] n95_o;
-  wire n96_o;
-  wire n97_o;
-  wire n98_o;
-  wire [15:0] n101_o;
-  wire n102_o;
-  wire n103_o;
-  wire n104_o;
-  wire [15:0] n107_o;
-  wire n108_o;
-  wire n109_o;
-  wire n110_o;
-  wire n111_o;
-  wire n112_o;
-  wire [15:0] n115_o;
-  wire n116_o;
-  wire n117_o;
-  wire n118_o;
-  wire [15:0] n121_o;
-  wire n122_o;
-  wire n123_o;
-  wire n124_o;
-  wire [15:0] n127_o;
-  wire n128_o;
-  wire n129_o;
-  wire n130_o;
-  wire [15:0] n133_o;
-  wire n134_o;
-  wire n135_o;
-  wire n136_o;
-  wire [15:0] n139_o;
-  wire n140_o;
-  wire n141_o;
-  wire n142_o;
-  wire [15:0] n145_o;
-  wire n146_o;
-  wire n147_o;
-  wire n148_o;
-  wire [15:0] n151_o;
-  wire n152_o;
-  wire n153_o;
-  wire n154_o;
-  wire [15:0] n157_o;
-  wire n158_o;
-  wire n159_o;
-  wire n160_o;
-  wire [15:0] n163_o;
-  wire n164_o;
-  wire n165_o;
-  wire n166_o;
-  wire [15:0] n169_o;
-  wire n170_o;
-  wire n171_o;
-  wire n172_o;
-  wire [15:0] n175_o;
-  wire n176_o;
-  wire n177_o;
-  wire n178_o;
-  wire [15:0] n181_o;
-  wire n182_o;
-  wire n183_o;
-  wire n184_o;
-  wire [15:0] n187_o;
-  wire n188_o;
-  wire n189_o;
-  wire n190_o;
-  wire [15:0] n193_o;
-  wire n194_o;
-  wire n195_o;
-  wire n196_o;
-  wire n197_o;
-  wire n198_o;
-  wire [15:0] n201_o;
-  wire n202_o;
-  wire n203_o;
-  wire n204_o;
-  wire [15:0] n207_o;
-  wire n208_o;
-  wire n209_o;
-  wire n210_o;
-  wire n211_o;
-  wire n212_o;
-  wire [15:0] n215_o;
-  wire n216_o;
-  wire n217_o;
-  wire n218_o;
-  wire n219_o;
-  wire n220_o;
-  wire n221_o;
-  wire n222_o;
-  wire [15:0] n225_o;
-  wire n226_o;
-  wire n227_o;
-  wire n228_o;
-  wire [15:0] n231_o;
-  wire n232_o;
-  wire n233_o;
-  wire n234_o;
-  wire [15:0] n237_o;
-  wire n238_o;
-  wire n239_o;
-  wire n240_o;
-  wire [15:0] n243_o;
-  wire n244_o;
-  wire n245_o;
-  wire n246_o;
-  wire [1:0] n247_o;
-  wire n248_o;
-  wire n249_o;
-  wire n250_o;
-  wire [1:0] n251_o;
-  wire n252_o;
-  wire n253_o;
-  wire n254_o;
-  wire n255_o;
+  wire [15:0] inst_type_masked_i16;
+  wire [15:0] inst_type_masked_sr;
+  wire [15:0] inst_type_masked_and;
+  wire [15:0] inst_type_masked_op;
+  wire [15:0] inst_type_masked_j;
+  wire [15:0] inst_type_masked_mj;
   wire n256_o;
   wire n257_o;
   wire n258_o;
@@ -786,449 +659,112 @@ module minimax (
     dra = n800_q; // (isignal)
   initial
     dra = 5'b00000;
-  /* .\minimax.vhd:76:16  */
-  always @*
-    op16 = n255_o; // (isignal)
-  initial
-    op16 = 1'b0;
   /* .\minimax.vhd:77:16  */
-  always @*
-    op16_addi4spn = (inst_type_masked == 16'b0000000000000000) & n67_o; // (isignal)
-  initial
+  always @* begin
+    op16_addi4spn   = (inst_type_masked     == 16'b0000000000000000) & ~bubble;
+    op16_lw         = (inst_type_masked     == 16'b0100000000000000) & ~bubble;
+    op16_sw         = (inst_type_masked     == 16'b1100000000000000) & ~bubble;
+  
+    op16_addi       = (inst_type_masked     == 16'b0000000000000001) & ~bubble;
+    op16_jal        = (inst_type_masked     == 16'b0010000000000001) & ~bubble;
+    op16_li         = (inst_type_masked     == 16'b0100000000000001) & ~bubble;
+    op16_addi16sp   = (inst_type_masked_i16 == 16'b0110000100000001) & ~bubble;
+    op16_lui        = (inst_type_masked     == 16'b0110000000000001) & ~bubble & ~op16_addi16sp;
+      
+    op16_srli       = (inst_type_masked_sr  == 16'b1000000000000101) & ~bubble;
+    op16_srai       = (inst_type_masked_sr  == 16'b1000010000000101) & ~bubble;
+    op16_andi       = (inst_type_masked_and == 16'b1000100000000001) & ~bubble;
+    op16_sub        = (inst_type_masked_op  == 16'b1000110000000001) & ~bubble;
+    op16_xor        = (inst_type_masked_op  == 16'b1000110000100001) & ~bubble;
+    op16_or         = (inst_type_masked_op  == 16'b1000110001000001) & ~bubble;
+    op16_and        = (inst_type_masked_op  == 16'b1000110001100001) & ~bubble;
+    op16_j          = (inst_type_masked     == 16'b1010000000000001) & ~bubble;
+    op16_beqz       = (inst_type_masked     == 16'b1100000000000001) & ~bubble;
+    op16_bnez       = (inst_type_masked     == 16'b1110000000000001) & ~bubble;
+  
+    op16_slli       = (inst_type_masked_j   == 16'b0000000000000110) & ~bubble;
+    op16_lwsp       = (inst_type_masked     == 16'b0100000000000010) & ~bubble;
+    op16_jr         = (inst_type_masked_j   == 16'b1000000000000010) & ~bubble;
+    op16_mv         = (inst_type_masked_mj  == 16'b1000000000000010) & ~bubble & ~op16_jr;
+    op16_ebreak     = (inst                 == 16'b1001000000000010) & ~bubble;
+    op16_jalr       = (inst_type_masked_j   == 16'b1001000000000010) & ~bubble & ~op16_ebreak;
+    op16_add        = (inst_type_masked_mj  == 16'b1001000000000010) & ~bubble & ~op16_jalr & ~ op16_ebreak;
+    op16_swsp       = (inst_type_masked     == 16'b1100000000000010) & ~bubble;
+
+    // Non-standard extensions to support microcode are permitted in these opcode gaps
+    op16_slli_setrd = (inst_type_masked_j   == 16'b0001000000000110) & ~bubble;
+    op16_slli_setrs = (inst_type_masked_j   == 16'b0001000000001010) & ~bubble;
+    op16_slli_thunk = (inst_type_masked_j   == 16'b0001000000010010) & ~bubble;
+
+    // Blanket matches for RVC and RV32I instructions
+    op32 = &(inst[1:0]) & ~bubble;
+    op16 = ~&(inst[1:0]) & ~bubble;
+
+  end initial begin
     op16_addi4spn = 1'b0;
-  /* .\minimax.vhd:78:16  */
-  always @*
-    op16_lw = n74_o; // (isignal)
-  initial
     op16_lw = 1'b0;
+    op16_sw = 1'b0;
+
+    op16_addi = 1'b0;
+    op16_jal = 1'b0;
+    op16_li = 1'b0;
+    op16_addi16sp = 1'b0;
+    op16_lui = 1'b0;
+
+    op16_srli = 1'b0;
+    op16_srai = 1'b0;
+    op16_andi = 1'b0;
+    op16_sub = 1'b0;
+    op16_xor = 1'b0;
+    op16_or = 1'b0;
+    op16_and = 1'b0;
+    op16_j = 1'b0;
+    op16_beqz = 1'b0;
+    op16_bnez = 1'b0;
+
+    op16_slli = 1'b0;
+    op16_lwsp = 1'b0;
+    op16_jr = 1'b0;
+    op16_mv = 1'b0;
+    op16_ebreak = 1'b0;
+    op16_jalr = 1'b0;
+    op16_add = 1'b0;
+    op16_swsp = 1'b0;
+
+    op16_slli_setrd = 1'b0;
+    op16_slli_setrs = 1'b0;
+    op16_slli_thunk = 1'b0;
+
+    op32 = 1'b0;
+    op16 = 1'b0;
+  end
   /* .\minimax.vhd:78:25  */
   always @*
     dly16_lw = n801_q; // (isignal)
   initial
     dly16_lw = 1'b0;
-  /* .\minimax.vhd:79:16  */
-  always @*
-    op16_sw = n80_o; // (isignal)
-  initial
-    op16_sw = 1'b0;
-  /* .\minimax.vhd:81:16  */
-  always @*
-    op16_addi = n86_o; // (isignal)
-  initial
-    op16_addi = 1'b0;
-  /* .\minimax.vhd:82:16  */
-  always @*
-    op16_jal = n92_o; // (isignal)
-  initial
-    op16_jal = 1'b0;
-  /* .\minimax.vhd:83:16  */
-  always @*
-    op16_li = n98_o; // (isignal)
-  initial
-    op16_li = 1'b0;
-  /* .\minimax.vhd:84:16  */
-  always @*
-    op16_addi16sp = n104_o; // (isignal)
-  initial
-    op16_addi16sp = 1'b0;
-  /* .\minimax.vhd:85:16  */
-  always @*
-    op16_lui = n112_o; // (isignal)
-  initial
-    op16_lui = 1'b0;
-  /* .\minimax.vhd:87:16  */
-  always @*
-    op16_srli = n118_o; // (isignal)
-  initial
-    op16_srli = 1'b0;
-  /* .\minimax.vhd:88:16  */
-  always @*
-    op16_srai = n124_o; // (isignal)
-  initial
-    op16_srai = 1'b0;
-  /* .\minimax.vhd:89:16  */
-  always @*
-    op16_andi = n130_o; // (isignal)
-  initial
-    op16_andi = 1'b0;
-  /* .\minimax.vhd:90:16  */
-  always @*
-    op16_sub = n136_o; // (isignal)
-  initial
-    op16_sub = 1'b0;
-  /* .\minimax.vhd:91:16  */
-  always @*
-    op16_xor = n142_o; // (isignal)
-  initial
-    op16_xor = 1'b0;
-  /* .\minimax.vhd:92:16  */
-  always @*
-    op16_or = n148_o; // (isignal)
-  initial
-    op16_or = 1'b0;
-  /* .\minimax.vhd:93:16  */
-  always @*
-    op16_and = n154_o; // (isignal)
-  initial
-    op16_and = 1'b0;
-  /* .\minimax.vhd:94:16  */
-  always @*
-    op16_j = n160_o; // (isignal)
-  initial
-    op16_j = 1'b0;
-  /* .\minimax.vhd:95:16  */
-  always @*
-    op16_beqz = n166_o; // (isignal)
-  initial
-    op16_beqz = 1'b0;
-  /* .\minimax.vhd:96:16  */
-  always @*
-    op16_bnez = n172_o; // (isignal)
-  initial
-    op16_bnez = 1'b0;
-  /* .\minimax.vhd:98:16  */
-  always @*
-    op16_slli = n178_o; // (isignal)
-  initial
-    op16_slli = 1'b0;
-  /* .\minimax.vhd:99:16  */
-  always @*
-    op16_lwsp = n184_o; // (isignal)
-  initial
-    op16_lwsp = 1'b0;
   /* .\minimax.vhd:99:27  */
   always @*
     dly16_lwsp = n802_q; // (isignal)
   initial
     dly16_lwsp = 1'b0;
-  /* .\minimax.vhd:100:16  */
-  always @*
-    op16_jr = n190_o; // (isignal)
-  initial
-    op16_jr = 1'b0;
-  /* .\minimax.vhd:101:16  */
-  always @*
-    op16_mv = n198_o; // (isignal)
-  initial
-    op16_mv = 1'b0;
-  /* .\minimax.vhd:103:16  */
-  always @*
-    op16_ebreak = n204_o; // (isignal)
-  initial
-    op16_ebreak = 1'b0;
-  /* .\minimax.vhd:104:16  */
-  always @*
-    op16_jalr = n212_o; // (isignal)
-  initial
-    op16_jalr = 1'b0;
-  /* .\minimax.vhd:105:16  */
-  always @*
-    op16_add = n222_o; // (isignal)
-  initial
-    op16_add = 1'b0;
-  /* .\minimax.vhd:106:16  */
-  always @*
-    op16_swsp = n228_o; // (isignal)
-  initial
-    op16_swsp = 1'b0;
-  /* .\minimax.vhd:108:16  */
-  always @*
-    op16_slli_setrd = n234_o; // (isignal)
-  initial
-    op16_slli_setrd = 1'b0;
   /* .\minimax.vhd:108:33  */
   always @*
     dly16_slli_setrd = n803_q; // (isignal)
   initial
     dly16_slli_setrd = 1'b0;
-  /* .\minimax.vhd:109:16  */
-  always @*
-    op16_slli_setrs = n240_o; // (isignal)
-  initial
-    op16_slli_setrs = 1'b0;
   /* .\minimax.vhd:109:33  */
   always @*
     dly16_slli_setrs = n804_q; // (isignal)
   initial
     dly16_slli_setrs = 1'b0;
-  /* .\minimax.vhd:110:16  */
-  always @*
-    op16_slli_thunk = n246_o; // (isignal)
-  initial
-    op16_slli_thunk = 1'b0;
-  /* .\minimax.vhd:113:16  */
-  always @*
-    op32 = n250_o; // (isignal)
-  initial
-    op32 = 1'b0;
-  /* .\minimax.vhd:117:33  */
   assign inst_type_masked = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:117:33  */
-  assign n66_o = inst_type_masked == 16'b0000000000000000;
-  /* .\minimax.vhd:117:64  */
-  assign n67_o = ~bubble;
-  /* .\minimax.vhd:118:41  */
-  assign n71_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:118:41  */
-  assign n72_o = n71_o == 16'b0100000000000000;
-  /* .\minimax.vhd:118:72  */
-  assign n73_o = ~bubble;
-  /* .\minimax.vhd:118:68  */
-  assign n74_o = n72_o & n73_o;
-  /* .\minimax.vhd:119:41  */
-  assign n77_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:119:41  */
-  assign n78_o = n77_o == 16'b1100000000000000;
-  /* .\minimax.vhd:119:72  */
-  assign n79_o = ~bubble;
-  /* .\minimax.vhd:119:68  */
-  assign n80_o = n78_o & n79_o;
-  /* .\minimax.vhd:121:33  */
-  assign n83_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:121:33  */
-  assign n84_o = n83_o == 16'b0000000000000001;
-  /* .\minimax.vhd:121:64  */
-  assign n85_o = ~bubble;
-  /* .\minimax.vhd:121:60  */
-  assign n86_o = n84_o & n85_o;
-  /* .\minimax.vhd:122:33  */
-  assign n89_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:122:33  */
-  assign n90_o = n89_o == 16'b0010000000000001;
-  /* .\minimax.vhd:122:64  */
-  assign n91_o = ~bubble;
-  /* .\minimax.vhd:122:60  */
-  assign n92_o = n90_o & n91_o;
-  /* .\minimax.vhd:123:41  */
-  assign n95_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:123:41  */
-  assign n96_o = n95_o == 16'b0100000000000001;
-  /* .\minimax.vhd:123:72  */
-  assign n97_o = ~bubble;
-  /* .\minimax.vhd:123:68  */
-  assign n98_o = n96_o & n97_o;
-  /* .\minimax.vhd:124:33  */
-  assign n101_o = inst & 16'b1110111110000011;
-  /* .\minimax.vhd:124:33  */
-  assign n102_o = n101_o == 16'b0110000100000001;
-  /* .\minimax.vhd:124:64  */
-  assign n103_o = ~bubble;
-  /* .\minimax.vhd:124:60  */
-  assign n104_o = n102_o & n103_o;
-  /* .\minimax.vhd:125:33  */
-  assign n107_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:125:33  */
-  assign n108_o = n107_o == 16'b0110000000000001;
-  /* .\minimax.vhd:125:64  */
-  assign n109_o = ~bubble;
-  /* .\minimax.vhd:125:60  */
-  assign n110_o = n108_o & n109_o;
-  /* .\minimax.vhd:125:79  */
-  assign n111_o = ~op16_addi16sp;
-  /* .\minimax.vhd:125:75  */
-  assign n112_o = n110_o & n111_o;
-  /* .\minimax.vhd:127:33  */
-  assign n115_o = inst & 16'b1111110001111111;
-  /* .\minimax.vhd:127:33  */
-  assign n116_o = n115_o == 16'b1000000000000101;
-  /* .\minimax.vhd:127:64  */
-  assign n117_o = ~bubble;
-  /* .\minimax.vhd:127:60  */
-  assign n118_o = n116_o & n117_o;
-  /* .\minimax.vhd:128:33  */
-  assign n121_o = inst & 16'b1111110001111111;
-  /* .\minimax.vhd:128:33  */
-  assign n122_o = n121_o == 16'b1000010000000101;
-  /* .\minimax.vhd:128:64  */
-  assign n123_o = ~bubble;
-  /* .\minimax.vhd:128:60  */
-  assign n124_o = n122_o & n123_o;
-  /* .\minimax.vhd:129:33  */
-  assign n127_o = inst & 16'b1110110000000011;
-  /* .\minimax.vhd:129:33  */
-  assign n128_o = n127_o == 16'b1000100000000001;
-  /* .\minimax.vhd:129:64  */
-  assign n129_o = ~bubble;
-  /* .\minimax.vhd:129:60  */
-  assign n130_o = n128_o & n129_o;
-  /* .\minimax.vhd:130:33  */
-  assign n133_o = inst & 16'b1110110001100011;
-  /* .\minimax.vhd:130:33  */
-  assign n134_o = n133_o == 16'b1000110000000001;
-  /* .\minimax.vhd:130:64  */
-  assign n135_o = ~bubble;
-  /* .\minimax.vhd:130:60  */
-  assign n136_o = n134_o & n135_o;
-  /* .\minimax.vhd:131:33  */
-  assign n139_o = inst & 16'b1110110001100011;
-  /* .\minimax.vhd:131:33  */
-  assign n140_o = n139_o == 16'b1000110000100001;
-  /* .\minimax.vhd:131:64  */
-  assign n141_o = ~bubble;
-  /* .\minimax.vhd:131:60  */
-  assign n142_o = n140_o & n141_o;
-  /* .\minimax.vhd:132:41  */
-  assign n145_o = inst & 16'b1110110001100011;
-  /* .\minimax.vhd:132:41  */
-  assign n146_o = n145_o == 16'b1000110001000001;
-  /* .\minimax.vhd:132:72  */
-  assign n147_o = ~bubble;
-  /* .\minimax.vhd:132:68  */
-  assign n148_o = n146_o & n147_o;
-  /* .\minimax.vhd:133:33  */
-  assign n151_o = inst & 16'b1110110001100011;
-  /* .\minimax.vhd:133:33  */
-  assign n152_o = n151_o == 16'b1000110001100001;
-  /* .\minimax.vhd:133:64  */
-  assign n153_o = ~bubble;
-  /* .\minimax.vhd:133:60  */
-  assign n154_o = n152_o & n153_o;
-  /* .\minimax.vhd:134:33  */
-  assign n157_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:134:33  */
-  assign n158_o = n157_o == 16'b1010000000000001;
-  /* .\minimax.vhd:134:64  */
-  assign n159_o = ~bubble;
-  /* .\minimax.vhd:134:60  */
-  assign n160_o = n158_o & n159_o;
-  /* .\minimax.vhd:135:33  */
-  assign n163_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:135:33  */
-  assign n164_o = n163_o == 16'b1100000000000001;
-  /* .\minimax.vhd:135:64  */
-  assign n165_o = ~bubble;
-  /* .\minimax.vhd:135:60  */
-  assign n166_o = n164_o & n165_o;
-  /* .\minimax.vhd:136:33  */
-  assign n169_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:136:33  */
-  assign n170_o = n169_o == 16'b1110000000000001;
-  /* .\minimax.vhd:136:64  */
-  assign n171_o = ~bubble;
-  /* .\minimax.vhd:136:60  */
-  assign n172_o = n170_o & n171_o;
-  /* .\minimax.vhd:138:33  */
-  assign n175_o = inst & 16'b1111000001111111;
-  /* .\minimax.vhd:138:33  */
-  assign n176_o = n175_o == 16'b0000000000000110;
-  /* .\minimax.vhd:138:64  */
-  assign n177_o = ~bubble;
-  /* .\minimax.vhd:138:60  */
-  assign n178_o = n176_o & n177_o;
-  /* .\minimax.vhd:139:33  */
-  assign n181_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:139:33  */
-  assign n182_o = n181_o == 16'b0100000000000010;
-  /* .\minimax.vhd:139:64  */
-  assign n183_o = ~bubble;
-  /* .\minimax.vhd:139:60  */
-  assign n184_o = n182_o & n183_o;
-  /* .\minimax.vhd:140:41  */
-  assign n187_o = inst & 16'b1111000001111111;
-  /* .\minimax.vhd:140:41  */
-  assign n188_o = n187_o == 16'b1000000000000010;
-  /* .\minimax.vhd:140:72  */
-  assign n189_o = ~bubble;
-  /* .\minimax.vhd:140:68  */
-  assign n190_o = n188_o & n189_o;
-  /* .\minimax.vhd:141:41  */
-  assign n193_o = inst & 16'b1111000000000011;
-  /* .\minimax.vhd:141:41  */
-  assign n194_o = n193_o == 16'b1000000000000010;
-  /* .\minimax.vhd:141:72  */
-  assign n195_o = ~bubble;
-  /* .\minimax.vhd:141:68  */
-  assign n196_o = n194_o & n195_o;
-  /* .\minimax.vhd:141:87  */
-  assign n197_o = ~op16_jr;
-  /* .\minimax.vhd:141:83  */
-  assign n198_o = n196_o & n197_o;
-  /* .\minimax.vhd:142:33  */
-  assign n201_o = inst & 16'b1111111111111111;
-  /* .\minimax.vhd:142:33  */
-  assign n202_o = n201_o == 16'b1001000000000010;
-  /* .\minimax.vhd:142:64  */
-  assign n203_o = ~bubble;
-  /* .\minimax.vhd:142:60  */
-  assign n204_o = n202_o & n203_o;
-  /* .\minimax.vhd:143:33  */
-  assign n207_o = inst & 16'b1111000001111111;
-  /* .\minimax.vhd:143:33  */
-  assign n208_o = n207_o == 16'b1001000000000010;
-  /* .\minimax.vhd:143:64  */
-  assign n209_o = ~bubble;
-  /* .\minimax.vhd:143:60  */
-  assign n210_o = n208_o & n209_o;
-  /* .\minimax.vhd:143:79  */
-  assign n211_o = ~op16_ebreak;
-  /* .\minimax.vhd:143:75  */
-  assign n212_o = n210_o & n211_o;
-  /* .\minimax.vhd:144:33  */
-  assign n215_o = inst & 16'b1111000000000011;
-  /* .\minimax.vhd:144:33  */
-  assign n216_o = n215_o == 16'b1001000000000010;
-  /* .\minimax.vhd:144:64  */
-  assign n217_o = ~bubble;
-  /* .\minimax.vhd:144:60  */
-  assign n218_o = n216_o & n217_o;
-  /* .\minimax.vhd:144:79  */
-  assign n219_o = ~op16_jalr;
-  /* .\minimax.vhd:144:75  */
-  assign n220_o = n218_o & n219_o;
-  /* .\minimax.vhd:144:97  */
-  assign n221_o = ~op16_ebreak;
-  /* .\minimax.vhd:144:93  */
-  assign n222_o = n220_o & n221_o;
-  /* .\minimax.vhd:145:33  */
-  assign n225_o = inst & 16'b1110000000000011;
-  /* .\minimax.vhd:145:33  */
-  assign n226_o = n225_o == 16'b1100000000000010;
-  /* .\minimax.vhd:145:64  */
-  assign n227_o = ~bubble;
-  /* .\minimax.vhd:145:60  */
-  assign n228_o = n226_o & n227_o;
-  /* .\minimax.vhd:148:41  */
-  assign n231_o = inst & 16'b1111000001111111;
-  /* .\minimax.vhd:148:41  */
-  assign n232_o = n231_o == 16'b0001000000000110;
-  /* .\minimax.vhd:148:72  */
-  assign n233_o = ~bubble;
-  /* .\minimax.vhd:148:68  */
-  assign n234_o = n232_o & n233_o;
-  /* .\minimax.vhd:149:41  */
-  assign n237_o = inst & 16'b1111000001111111;
-  /* .\minimax.vhd:149:41  */
-  assign n238_o = n237_o == 16'b0001000000001010;
-  /* .\minimax.vhd:149:72  */
-  assign n239_o = ~bubble;
-  /* .\minimax.vhd:149:68  */
-  assign n240_o = n238_o & n239_o;
-  /* .\minimax.vhd:150:41  */
-  assign n243_o = inst & 16'b1111000001111111;
-  /* .\minimax.vhd:150:41  */
-  assign n244_o = n243_o == 16'b0001000000010010;
-  /* .\minimax.vhd:150:72  */
-  assign n245_o = ~bubble;
-  /* .\minimax.vhd:150:68  */
-  assign n246_o = n244_o & n245_o;
-  /* .\minimax.vhd:153:25  */
-  assign n247_o = inst[1:0];
-  /* .\minimax.vhd:153:17  */
-  assign n248_o = &(n247_o);
-  /* .\minimax.vhd:153:42  */
-  assign n249_o = ~bubble;
-  /* .\minimax.vhd:153:38  */
-  assign n250_o = n248_o & n249_o;
-  /* .\minimax.vhd:154:26  */
-  assign n251_o = inst[1:0];
-  /* .\minimax.vhd:154:17  */
-  assign n252_o = &(n251_o);
-  /* .\minimax.vhd:154:17  */
-  assign n253_o = ~n252_o;
-  /* .\minimax.vhd:154:43  */
-  assign n254_o = ~bubble;
-  /* .\minimax.vhd:154:39  */
-  assign n255_o = n253_o & n254_o;
+  assign inst_type_masked_i16 = inst & 16'b1110111110000011;
+  assign inst_type_masked_sr = inst & 16'b1111110001111111;
+  assign inst_type_masked_and = inst & 16'b1110110000000011;
+  assign inst_type_masked_op = inst & 16'b1110110001100011;
+  assign inst_type_masked_j = inst & 16'b1111000001111111;
+  assign inst_type_masked_mj = inst & 16'b1111000000000011;
   /* .\minimax.vhd:160:31  */
   assign n256_o = op16_addi4spn | op16_lw;
   /* .\minimax.vhd:160:42  */
