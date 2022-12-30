@@ -95,20 +95,6 @@ module minimax (
   wire n327_o;
   wire n328_o;
   reg n343_q;
-  wire [4:0] n346_o;
-  wire n347_o;
-  wire [4:0] n348_o;
-  wire [4:0] n349_o;
-  wire [2:0] n350_o;
-  wire [4:0] n352_o;
-  wire [4:0] n353_o;
-  wire [4:0] n354_o;
-  wire [4:0] n355_o;
-  wire [4:0] n356_o;
-  wire n357_o;
-  wire [4:0] n358_o;
-  wire [4:0] n359_o;
-  wire [4:0] n360_o;
   wire n367_o;
   wire n368_o;
   wire [4:0] n369_o;
@@ -496,7 +482,6 @@ module minimax (
   wire n781_o;
   wire [5:0] addrS_wire;
   wire [5:0] n793_o;
-  reg [4:0] n800_q;
   wire [31:0] n807_data; // mem_rd
   wire [31:0] n808_data; // mem_rd
   assign inst_addr = n293_o;
@@ -544,11 +529,6 @@ module minimax (
     wb = n776_o; // (isignal)
   initial
     wb = 1'b0;
-  /* .\minimax.vhd:73:16  */
-  always @*
-    dra = n800_q; // (isignal)
-  initial
-    dra = 5'b00000;
 
   always @* begin
     op16_addi4spn   = (inst_type_masked     == 16'b0000000000000000) & ~bubble;
@@ -705,34 +685,6 @@ module minimax (
     n343_q <= n328_o;
   initial
     n343_q = 1'b1;
-  /* .\minimax.vhd:227:37  */
-  assign n346_o = regd[4:0];
-  /* .\minimax.vhd:227:71  */
-  assign n347_o = op16_slli_setrd | op16_slli_setrs;
-  /* .\minimax.vhd:227:50  */
-  assign n348_o = {{4{n347_o}}, n347_o}; // sext
-  /* .\minimax.vhd:227:50  */
-  assign n349_o = n346_o & n348_o;
-  /* .\minimax.vhd:228:49  */
-  assign n350_o = inst[4:2];
-  /* .\minimax.vhd:228:43  */
-  assign n352_o = {2'b01, n350_o};
-  /* .\minimax.vhd:228:63  */
-  assign n353_o = {{4{op16_lw}}, op16_lw}; // sext
-  /* .\minimax.vhd:228:63  */
-  assign n354_o = n352_o & n353_o;
-  /* .\minimax.vhd:228:33  */
-  assign n355_o = n349_o | n354_o;
-  /* .\minimax.vhd:229:42  */
-  assign n356_o = inst[11:7];
-  /* .\minimax.vhd:229:72  */
-  assign n357_o = op16_lwsp | op32;
-  /* .\minimax.vhd:229:57  */
-  assign n358_o = {{4{n357_o}}, n357_o}; // sext
-  /* .\minimax.vhd:229:57  */
-  assign n359_o = n356_o & n358_o;
-  /* .\minimax.vhd:229:33  */
-  assign n360_o = n355_o | n359_o;
   /* .\minimax.vhd:234:57  */
   assign n367_o = dly16_slli_setrd | dly16_lw;
   /* .\minimax.vhd:234:69  */
@@ -1481,11 +1433,6 @@ module minimax (
   /* .\minimax.vhd:319:17  */
   assign addrS_wire = {addrS_5, addrS_4_0};
   assign n793_o = {n455_o, n413_o};
-  /* .\minimax.vhd:219:17  */
-  always @(posedge clk)
-    n800_q <= n360_o;
-  initial
-    n800_q = 5'b00000;
 
   // Fetch Process
   always @(posedge clk) begin
@@ -1523,16 +1470,26 @@ module minimax (
     microcode = 1'b0;
   end
 
+  // Datapath Process
   always @(posedge clk) begin
     dly16_lw <= op16_lw;
     dly16_lwsp <= op16_lwsp;
     dly16_slli_setrd <= op16_slli_setrd;
     dly16_slli_setrs <= op16_slli_setrs;
+
+    // Load and setrs/setrd instructions complete a cycle after they are
+    // initiated, so we need to keep some state.
+    dra <= (regd[4:0] & ({{4{op16_slli_setrd | op16_slli_setrs}}, op16_slli_setrd | op16_slli_setrs})) |
+           (({2'b01, inst[4:2]}) & ({{4{op16_lw}}, op16_lw})) |
+           inst[11:7] & {{4{op16_lwsp | op32}}, op16_lwsp | op32};
+
   end initial begin
     dly16_lw = 1'b0;
     dly16_lwsp = 1'b0;
     dly16_slli_setrd = 1'b0;
     dly16_slli_setrs = 1'b0;
+
+    dra = 5'b00000;
   end
 
   /* .\minimax.vhd:261:31  */
