@@ -1,14 +1,19 @@
-module minimax (
+module minimax #(
+  // Parameters are currently unimplemented
+  parameter PC_BITS = 12,
+  parameter UC_BASE = 32'h00000000,
+  parameter TRACE = 0
+) (
   input  clk,
    input  reset,
    input  [15:0] inst,
    input  [31:0] rdata,
-   output [11:0] inst_addr,
+   output reg [11:0] inst_addr,
    output reg inst_regce,
-   output [31:0] addr,
-   output [31:0] wdata,
-   output [3:0] wmask,
-   output rreq);
+   output reg [31:0] addr,
+   output reg [31:0] wdata,
+   output reg [3:0] wmask,
+   output reg rreq);
   wire [5:0] addrS;
   wire [5:0] addrD;
   wire [31:0] regS;
@@ -78,11 +83,9 @@ module minimax (
   wire rd_banksel;
   wire rs_banksel;
 
-  wire branch_taken;
+  reg branch_taken;
   wire [4:0] addrd_port;
   wire [4:0] addrs_port;
-  wire [31:0] regS; // mem_rd
-  wire [31:0] regD; // mem_rd
 
   always @* begin
     op16_addi4spn   = (inst_type_masked     == 16'b0000000000000000) & ~bubble;
