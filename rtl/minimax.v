@@ -75,37 +75,6 @@ module minimax (
   wire [15:0] inst_type_masked_op;
   wire [15:0] inst_type_masked_j;
   wire [15:0] inst_type_masked_mj;
-  wire n256_o;
-  wire n257_o;
-  wire n258_o;
-  wire n259_o;
-  wire n260_o;
-  wire n261_o;
-  wire n262_o;
-  wire n263_o;
-  wire n264_o;
-  wire n265_o;
-  wire n266_o;
-  wire n267_o;
-  wire n268_o;
-  wire n269_o;
-  wire n270_o;
-  wire n271_o;
-  wire n272_o;
-  wire n273_o;
-  wire n274_o;
-  wire n275_o;
-  wire n276_o;
-  wire n277_o;
-  wire n278_o;
-  wire n279_o;
-  wire n280_o;
-  wire n281_o;
-  wire n282_o;
-  wire n283_o;
-  wire n284_o;
-  wire n285_o;
-  wire n286_o;
   wire n287_o;
   wire n288_o;
   wire [3:0] n290_o;
@@ -550,10 +519,6 @@ module minimax (
   reg n798_q;
   reg n799_q;
   reg [4:0] n800_q;
-  reg n801_q;
-  reg n802_q;
-  reg n803_q;
-  reg n804_q;
   reg n805_q;
   wire [31:0] n807_data; // mem_rd
   wire [31:0] n808_data; // mem_rd
@@ -634,21 +599,6 @@ module minimax (
     microcode = n799_q; // (isignal)
   initial
     microcode = 1'b0;
-  /* .\minimax.vhd:69:16  */
-  always @*
-    trap = n286_o; // (isignal)
-  initial
-    trap = 1'b0;
-  /* .\minimax.vhd:69:22  */
-  always @*
-    op16_trap = n285_o; // (isignal)
-  initial
-    op16_trap = 1'b0;
-  /* .\minimax.vhd:69:33  */
-  always @*
-    op32_trap = op32; // (isignal)
-  initial
-    op32_trap = 1'b0;
   /* .\minimax.vhd:72:16  */
   always @*
     wb = n776_o; // (isignal)
@@ -700,6 +650,17 @@ module minimax (
     op32 = &(inst[1:0]) & ~bubble;
     op16 = ~&(inst[1:0]) & ~bubble;
 
+    // Trap on unimplemented instructions
+    op32_trap = op32;
+    op16_trap = op16 & ~(
+        op16_addi4spn | op16_lw | op16_sw |
+        op16_addi | op16_jal | op16_li | op16_addi16sp | op16_lui |
+        op16_srli | op16_srai | op16_andi | op16_sub| op16_xor| op16_or| op16_and| op16_j| op16_beqz| op16_bnez |
+        op16_slli | op16_lwsp | op16_jr | op16_mv | op16_ebreak | op16_jalr | op16_add | op16_swsp |
+        op16_slli_setrd | op16_slli_setrs | op16_slli_thunk);
+
+    trap = op16_trap | op32_trap; // (isignal)
+
   end initial begin
     op16_addi4spn = 1'b0;
     op16_lw = 1'b0;
@@ -737,27 +698,12 @@ module minimax (
 
     op32 = 1'b0;
     op16 = 1'b0;
+
+    op32_trap = 1'b0;
+    op16_trap = 1'b0;
+
+    trap = 1'b0;
   end
-  /* .\minimax.vhd:78:25  */
-  always @*
-    dly16_lw = n801_q; // (isignal)
-  initial
-    dly16_lw = 1'b0;
-  /* .\minimax.vhd:99:27  */
-  always @*
-    dly16_lwsp = n802_q; // (isignal)
-  initial
-    dly16_lwsp = 1'b0;
-  /* .\minimax.vhd:108:33  */
-  always @*
-    dly16_slli_setrd = n803_q; // (isignal)
-  initial
-    dly16_slli_setrd = 1'b0;
-  /* .\minimax.vhd:109:33  */
-  always @*
-    dly16_slli_setrs = n804_q; // (isignal)
-  initial
-    dly16_slli_setrs = 1'b0;
   assign inst_type_masked = inst & 16'b1110000000000011;
   assign inst_type_masked_i16 = inst & 16'b1110111110000011;
   assign inst_type_masked_sr = inst & 16'b1111110001111111;
@@ -765,68 +711,7 @@ module minimax (
   assign inst_type_masked_op = inst & 16'b1110110001100011;
   assign inst_type_masked_j = inst & 16'b1111000001111111;
   assign inst_type_masked_mj = inst & 16'b1111000000000011;
-  /* .\minimax.vhd:160:31  */
-  assign n256_o = op16_addi4spn | op16_lw;
-  /* .\minimax.vhd:160:42  */
-  assign n257_o = n256_o | op16_sw;
-  /* .\minimax.vhd:160:53  */
-  assign n258_o = n257_o | op16_addi;
-  /* .\minimax.vhd:161:27  */
-  assign n259_o = n258_o | op16_jal;
-  /* .\minimax.vhd:161:39  */
-  assign n260_o = n259_o | op16_li;
-  /* .\minimax.vhd:161:50  */
-  assign n261_o = n260_o | op16_addi16sp;
-  /* .\minimax.vhd:161:67  */
-  assign n262_o = n261_o | op16_lui;
-  /* .\minimax.vhd:161:79  */
-  assign n263_o = n262_o | op16_srli;
-  /* .\minimax.vhd:162:27  */
-  assign n264_o = n263_o | op16_srai;
-  /* .\minimax.vhd:162:40  */
-  assign n265_o = n264_o | op16_andi;
-  /* .\minimax.vhd:162:53  */
-  assign n266_o = n265_o | op16_sub;
-  /* .\minimax.vhd:162:65  */
-  assign n267_o = n266_o | op16_xor;
-  /* .\minimax.vhd:162:77  */
-  assign n268_o = n267_o | op16_or;
-  /* .\minimax.vhd:162:88  */
-  assign n269_o = n268_o | op16_and;
-  /* .\minimax.vhd:162:100  */
-  assign n270_o = n269_o | op16_j;
-  /* .\minimax.vhd:162:110  */
-  assign n271_o = n270_o | op16_beqz;
-  /* .\minimax.vhd:162:123  */
-  assign n272_o = n271_o | op16_bnez;
-  /* .\minimax.vhd:162:136  */
-  assign n273_o = n272_o | op16_slli;
-  /* .\minimax.vhd:163:27  */
-  assign n274_o = n273_o | op16_lwsp;
-  /* .\minimax.vhd:163:40  */
-  assign n275_o = n274_o | op16_jr;
-  /* .\minimax.vhd:163:51  */
-  assign n276_o = n275_o | op16_mv;
-  /* .\minimax.vhd:163:62  */
-  assign n277_o = n276_o | op16_ebreak;
-  /* .\minimax.vhd:163:77  */
-  assign n278_o = n277_o | op16_jalr;
-  /* .\minimax.vhd:163:90  */
-  assign n279_o = n278_o | op16_add;
-  /* .\minimax.vhd:163:102  */
-  assign n280_o = n279_o | op16_swsp;
-  /* .\minimax.vhd:163:115  */
-  assign n281_o = n280_o | op16_slli_setrd;
-  /* .\minimax.vhd:164:33  */
-  assign n282_o = n281_o | op16_slli_setrs;
-  /* .\minimax.vhd:164:52  */
-  assign n283_o = n282_o | op16_slli_thunk;
-  /* .\minimax.vhd:159:31  */
-  assign n284_o = ~n283_o;
-  /* .\minimax.vhd:159:27  */
-  assign n285_o = op16 & n284_o;
-  /* .\minimax.vhd:166:27  */
-  assign n286_o = op16_trap | op32_trap;
+
   /* .\minimax.vhd:175:27  */
   assign n287_o = op16_lwsp | op16_lw;
   /* .\minimax.vhd:176:38  */
@@ -1717,26 +1602,19 @@ module minimax (
     n800_q <= n360_o;
   initial
     n800_q = 5'b00000;
-  /* .\minimax.vhd:219:17  */
-  always @(posedge clk)
-    n801_q <= op16_lw;
-  initial
-    n801_q = 1'b0;
-  /* .\minimax.vhd:219:17  */
-  always @(posedge clk)
-    n802_q <= op16_lwsp;
-  initial
-    n802_q = 1'b0;
-  /* .\minimax.vhd:219:17  */
-  always @(posedge clk)
-    n803_q <= op16_slli_setrd;
-  initial
-    n803_q = 1'b0;
-  /* .\minimax.vhd:219:17  */
-  always @(posedge clk)
-    n804_q <= op16_slli_setrs;
-  initial
-    n804_q = 1'b0;
+
+  always @(posedge clk) begin
+    dly16_lw <= op16_lw;
+    dly16_lwsp <= op16_lwsp;
+    dly16_slli_setrd <= op16_slli_setrd;
+    dly16_slli_setrs <= op16_slli_setrs;
+  end initial begin
+    dly16_lw = 1'b0;
+    dly16_lwsp = 1'b0;
+    dly16_slli_setrd = 1'b0;
+    dly16_slli_setrs = 1'b0;
+  end
+
   /* .\minimax.vhd:191:17  */
   always @(posedge clk)
     n805_q <= n317_o;
