@@ -75,6 +75,10 @@ module minimax (
   wire [15:0] inst_type_masked_op;
   wire [15:0] inst_type_masked_j;
   wire [15:0] inst_type_masked_mj;
+
+  wire rd_banksel;
+  wire rs_banksel;
+
   wire n288_o;
   wire [3:0] n290_o;
   wire [3:0] n291_o;
@@ -114,7 +118,6 @@ module minimax (
   wire [4:0] n385_o;
   wire [4:0] n386_o;
   wire [4:0] n387_o;
-  wire [4:0] n388_o;
   wire n389_o;
   wire n390_o;
   wire n391_o;
@@ -124,10 +127,6 @@ module minimax (
   wire n395_o;
   wire n396_o;
   wire n397_o;
-  wire n398_o;
-  wire [4:0] n399_o;
-  wire [4:0] n400_o;
-  wire [4:0] n401_o;
   wire [2:0] n402_o;
   wire [4:0] n404_o;
   wire n405_o;
@@ -138,7 +137,7 @@ module minimax (
   wire n410_o;
   wire [4:0] n411_o;
   wire [4:0] n412_o;
-  wire [4:0] n413_o;
+  wire [4:0] addrd_port;
   wire [4:0] n414_o;
   wire [4:0] n415_o;
   wire n416_o;
@@ -175,11 +174,8 @@ module minimax (
   wire n450_o;
   wire [4:0] n451_o;
   wire [4:0] n452_o;
-  wire [4:0] addrS_4_0;
+  wire [4:0] addrs_port;
   wire n454_o;
-  wire n455_o;
-  wire microcode_xor_dly16_slli_setrs;
-  wire addrS_5;
   wire n468_o;
   wire n469_o;
   wire n470_o;
@@ -480,18 +476,12 @@ module minimax (
   wire [4:0] n779_o;
   wire n780_o;
   wire n781_o;
-  wire [5:0] addrS_wire;
-  wire [5:0] n793_o;
   wire [31:0] n807_data; // mem_rd
   wire [31:0] n808_data; // mem_rd
   assign inst_addr = n293_o;
   assign addr = alus;
   assign wdata = regd;
   assign wmask = n291_o;
-  /* .\minimax.vhd:57:16  */
-  assign addrs = addrS_wire; // (signal)
-  /* .\minimax.vhd:57:23  */
-  assign addrd = n793_o; // (signal)
   /* .\minimax.vhd:58:16  */
   assign regs = n807_data; // (signal)
   /* .\minimax.vhd:58:22  */
@@ -723,8 +713,6 @@ module minimax (
   assign n386_o = n384_o & n385_o;
   /* .\minimax.vhd:237:25  */
   assign n387_o = n383_o | n386_o;
-  /* .\minimax.vhd:238:33  */
-  assign n388_o = inst[11:7];
   /* .\minimax.vhd:238:62  */
   assign n389_o = op16_addi | op16_add;
   /* .\minimax.vhd:239:49  */
@@ -743,14 +731,6 @@ module minimax (
   assign n396_o = n395_o | op16_li;
   /* .\minimax.vhd:242:44  */
   assign n397_o = n396_o | op16_lui;
-  /* .\minimax.vhd:243:33  */
-  assign n398_o = n397_o | op16_slli;
-  /* .\minimax.vhd:238:47  */
-  assign n399_o = {{4{n398_o}}, n398_o}; // sext
-  /* .\minimax.vhd:238:47  */
-  assign n400_o = n388_o & n399_o;
-  /* .\minimax.vhd:238:25  */
-  assign n401_o = n387_o | n400_o;
   /* .\minimax.vhd:244:41  */
   assign n402_o = inst[9:7];
   /* .\minimax.vhd:244:35  */
@@ -772,7 +752,6 @@ module minimax (
   /* .\minimax.vhd:244:55  */
   assign n412_o = n404_o & n411_o;
   /* .\minimax.vhd:244:25  */
-  assign n413_o = n401_o | n412_o;
   /* .\minimax.vhd:249:35  */
   assign n414_o = {{4{dly16_slli_setrs}}, dly16_slli_setrs}; // sext
   /* .\minimax.vhd:249:35  */
@@ -845,16 +824,8 @@ module minimax (
   assign n451_o = {{4{n450_o}}, n450_o}; // sext
   /* .\minimax.vhd:254:46  */
   assign n452_o = n447_o & n451_o;
-  /* .\minimax.vhd:254:25  */
-  assign addrS_4_0 = n446_o | n452_o;
   /* .\minimax.vhd:257:32  */
   assign n454_o = microcode ^ dly16_slli_setrd;
-  /* .\minimax.vhd:257:54  */
-  assign n455_o = n454_o | trap;
-  /* .\minimax.vhd:258:32  */
-  assign microcode_xor_dly16_slli_setrs = microcode ^ dly16_slli_setrs;
-  /* .\minimax.vhd:258:54  */
-  assign addrS_5 = microcode_xor_dly16_slli_setrs | trap;
   /* .\minimax.vhd:264:37  */
   assign n468_o = op16_add | op16_addi;
   /* .\minimax.vhd:264:50  */
@@ -1430,14 +1401,26 @@ module minimax (
   assign n780_o = |(n779_o);
   /* .\minimax.vhd:321:51  */
   assign n781_o = n780_o & wb;
-  /* .\minimax.vhd:319:17  */
-  assign addrS_wire = {addrS_5, addrS_4_0};
-  assign n793_o = {n455_o, n413_o};
+
+  // READ/WRITE register file port
+  assign addrd_port = (n387_o |
+    (inst[11:7] & ({5{n397_o | op16_slli}}))) |
+          n412_o;
+
+  // READ-ONLY register file port
+  assign addrs_port = n446_o | n452_o;
+
+  // Select between "normal" and "microcode" register banks.
+  assign rs_banksel = (microcode ^ dly16_slli_setrs) | trap;
+  assign rd_banksel = (microcode ^ dly16_slli_setrd) | trap;
+
+  assign addrd = {rd_banksel, addrd_port};
+  assign addrs = {rs_banksel, addrs_port};
 
   // Fetch Process
   always @(posedge clk) begin
     // Update fetch instruction unless we're hung up on a multi-cycle instruction word
-    pc_fetch <= agux & {{10{~reset}}, ~reset};
+    pc_fetch <= agux & {11{~reset}};
 
     // Fetch misses create a 2-cycle penalty
     bubble2 <= reset | branch_taken | trap;
@@ -1479,9 +1462,9 @@ module minimax (
 
     // Load and setrs/setrd instructions complete a cycle after they are
     // initiated, so we need to keep some state.
-    dra <= (regd[4:0] & ({{4{op16_slli_setrd | op16_slli_setrs}}, op16_slli_setrd | op16_slli_setrs})) |
-           (({2'b01, inst[4:2]}) & ({{4{op16_lw}}, op16_lw})) |
-           inst[11:7] & {{4{op16_lwsp | op32}}, op16_lwsp | op32};
+    dra <= (regd[4:0] & ({5{op16_slli_setrd | op16_slli_setrs}})) |
+           (({2'b01, inst[4:2]}) & ({5{op16_lw}})) |
+           inst[11:7] & {5{op16_lwsp | op32}};
 
   end initial begin
     dly16_lw = 1'b0;
