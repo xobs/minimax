@@ -1,6 +1,6 @@
 # Script adapted from https://github.com/YosysHQ/yosys/issues/302#issuecomment-276019637
 
-read_verilog rtl/base-minimax.v
+read_verilog base-minimax.v
 prep -flatten -top minimax
 splitnets -ports;;
 design -stash reference
