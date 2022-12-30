@@ -9,14 +9,14 @@ module minimax (
    output [31:0] wdata,
    output [3:0] wmask,
    output rreq);
-  wire [5:0] addrs;
-  wire [5:0] addrd;
-  wire [31:0] regs;
-  wire [31:0] regd;
-  wire [31:0] alua;
-  wire [31:0] alub;
-  wire [31:0] alus;
-  wire [31:0] alux;
+  wire [5:0] addrS;
+  wire [5:0] addrD;
+  wire [31:0] regS;
+  wire [31:0] regD;
+  wire [31:0] aluA;
+  wire [31:0] aluB;
+  wire [31:0] aluS;
+  wire [31:0] aluX;
   reg [10:0] pc_fetch;
   reg [10:0] pc_fetch_dly;
   reg [10:0] pc_execute;
@@ -99,250 +99,8 @@ module minimax (
   wire n327_o;
   wire n328_o;
   reg n343_q;
-  wire n367_o;
-  wire n368_o;
-  wire [4:0] n369_o;
-  wire [4:0] n370_o;
-  wire n371_o;
-  wire n372_o;
-  wire [4:0] n374_o;
-  wire [4:0] n375_o;
-  wire [4:0] n376_o;
-  wire [2:0] n377_o;
-  wire [4:0] n379_o;
-  wire n380_o;
-  wire [4:0] n381_o;
-  wire [4:0] n382_o;
-  wire [4:0] n383_o;
-  wire [4:0] n384_o;
-  wire [4:0] n385_o;
-  wire [4:0] n386_o;
-  wire [4:0] n387_o;
-  wire n389_o;
-  wire n390_o;
-  wire n391_o;
-  wire n392_o;
-  wire n393_o;
-  wire n394_o;
-  wire n395_o;
-  wire n396_o;
-  wire n397_o;
-  wire [2:0] n402_o;
-  wire [4:0] n404_o;
-  wire n405_o;
-  wire n406_o;
-  wire n407_o;
-  wire n408_o;
-  wire n409_o;
-  wire n410_o;
-  wire [4:0] n411_o;
-  wire [4:0] n412_o;
   wire [4:0] addrd_port;
-  wire [4:0] n414_o;
-  wire [4:0] n415_o;
-  wire n416_o;
-  wire n417_o;
-  wire [4:0] n419_o;
-  wire [4:0] n420_o;
-  wire [4:0] n421_o;
-  wire [4:0] n422_o;
-  wire n423_o;
-  wire n424_o;
-  wire n425_o;
-  wire [4:0] n426_o;
-  wire [4:0] n427_o;
-  wire [4:0] n428_o;
-  wire [2:0] n429_o;
-  wire [4:0] n431_o;
-  wire n432_o;
-  wire n433_o;
-  wire n434_o;
-  wire [4:0] n435_o;
-  wire [4:0] n436_o;
-  wire [4:0] n437_o;
-  wire [2:0] n438_o;
-  wire [4:0] n440_o;
-  wire n441_o;
-  wire n442_o;
-  wire n443_o;
-  wire [4:0] n444_o;
-  wire [4:0] n445_o;
-  wire [4:0] n446_o;
-  wire [4:0] n447_o;
-  wire n448_o;
-  wire n449_o;
-  wire n450_o;
-  wire [4:0] n451_o;
-  wire [4:0] n452_o;
   wire [4:0] addrs_port;
-  wire n454_o;
-  wire n468_o;
-  wire n469_o;
-  wire n470_o;
-  wire n471_o;
-  wire n472_o;
-  wire n473_o;
-  wire n474_o;
-  wire n475_o;
-  wire n476_o;
-  wire n477_o;
-  wire [31:0] n478_o;
-  wire [31:0] n479_o;
-  wire [3:0] n480_o;
-  wire [25:0] n482_o;
-  wire [1:0] n483_o;
-  wire [27:0] n484_o;
-  wire n485_o;
-  wire [28:0] n486_o;
-  wire n487_o;
-  wire [29:0] n488_o;
-  wire [31:0] n490_o;
-  wire [31:0] n491_o;
-  wire [31:0] n492_o;
-  wire [31:0] n493_o;
-  wire [1:0] n494_o;
-  wire [25:0] n496_o;
-  wire [3:0] n497_o;
-  wire [29:0] n498_o;
-  wire [31:0] n500_o;
-  wire [31:0] n501_o;
-  wire [31:0] n502_o;
-  wire [31:0] n503_o;
-  wire [1:0] n504_o;
-  wire [25:0] n506_o;
-  wire n507_o;
-  wire [26:0] n508_o;
-  wire [2:0] n509_o;
-  wire [29:0] n510_o;
-  wire [31:0] n512_o;
-  wire [31:0] n513_o;
-  wire [31:0] n514_o;
-  wire [31:0] n515_o;
-  wire n516_o;
-  wire [25:0] n518_o;
-  wire [2:0] n519_o;
-  wire [28:0] n520_o;
-  wire n521_o;
-  wire [29:0] n522_o;
-  wire [31:0] n524_o;
-  wire n525_o;
-  wire [31:0] n526_o;
-  wire [31:0] n527_o;
-  wire [31:0] n528_o;
-  wire n529_o;
-  wire n530_o;
-  wire n531_o;
-  wire n532_o;
-  wire n533_o;
-  wire n534_o;
-  wire n535_o;
-  wire n536_o;
-  wire n537_o;
-  wire n538_o;
-  wire n539_o;
-  wire n540_o;
-  wire n541_o;
-  wire n542_o;
-  wire n543_o;
-  wire n544_o;
-  wire n545_o;
-  wire n546_o;
-  wire n547_o;
-  wire n548_o;
-  wire n549_o;
-  wire n550_o;
-  wire n551_o;
-  wire n552_o;
-  wire n553_o;
-  wire n554_o;
-  wire n555_o;
-  wire [3:0] n556_o;
-  wire [3:0] n557_o;
-  wire [3:0] n558_o;
-  wire [3:0] n559_o;
-  wire [3:0] n560_o;
-  wire [3:0] n561_o;
-  wire [2:0] n562_o;
-  wire [15:0] n563_o;
-  wire [10:0] n564_o;
-  wire [26:0] n565_o;
-  wire [4:0] n566_o;
-  wire [31:0] n567_o;
-  wire n568_o;
-  wire n569_o;
-  wire [31:0] n570_o;
-  wire [31:0] n571_o;
-  wire [31:0] n572_o;
-  wire n573_o;
-  wire n574_o;
-  wire n575_o;
-  wire n576_o;
-  wire n577_o;
-  wire n578_o;
-  wire n579_o;
-  wire n580_o;
-  wire n581_o;
-  wire n582_o;
-  wire n583_o;
-  wire n584_o;
-  wire n585_o;
-  wire n586_o;
-  wire n587_o;
-  wire [3:0] n588_o;
-  wire [3:0] n589_o;
-  wire [3:0] n590_o;
-  wire [2:0] n591_o;
-  wire [14:0] n592_o;
-  wire [4:0] n593_o;
-  wire [19:0] n594_o;
-  wire [31:0] n596_o;
-  wire [31:0] n597_o;
-  wire [31:0] n598_o;
-  wire [31:0] n599_o;
-  wire n600_o;
-  wire n601_o;
-  wire n602_o;
-  wire n603_o;
-  wire n604_o;
-  wire n605_o;
-  wire n606_o;
-  wire n607_o;
-  wire n608_o;
-  wire n609_o;
-  wire n610_o;
-  wire n611_o;
-  wire n612_o;
-  wire n613_o;
-  wire n614_o;
-  wire n615_o;
-  wire n616_o;
-  wire n617_o;
-  wire n618_o;
-  wire n619_o;
-  wire n620_o;
-  wire n621_o;
-  wire n622_o;
-  wire [3:0] n623_o;
-  wire [3:0] n624_o;
-  wire [3:0] n625_o;
-  wire [3:0] n626_o;
-  wire [3:0] n627_o;
-  wire [2:0] n628_o;
-  wire [15:0] n629_o;
-  wire [6:0] n630_o;
-  wire [22:0] n631_o;
-  wire [1:0] n632_o;
-  wire [24:0] n633_o;
-  wire n634_o;
-  wire [25:0] n635_o;
-  wire n636_o;
-  wire [26:0] n637_o;
-  wire n638_o;
-  wire [27:0] n639_o;
-  wire [31:0] n641_o;
-  wire [31:0] n642_o;
-  wire [31:0] n643_o;
-  wire [31:0] n644_o;
   wire [31:0] n645_o;
   wire [31:0] n646_o;
   wire [31:0] n647_o;
@@ -479,21 +237,18 @@ module minimax (
   wire [31:0] n807_data; // mem_rd
   wire [31:0] n808_data; // mem_rd
   assign inst_addr = n293_o;
-  assign addr = alus;
-  assign wdata = regd;
+  assign addr = aluS;
+  assign wdata = regD;
   assign wmask = n291_o;
   /* .\minimax.vhd:58:16  */
-  assign regs = n807_data; // (signal)
+  assign regS = n807_data; // (signal)
   /* .\minimax.vhd:58:22  */
-  assign regd = n808_data; // (signal)
-  /* .\minimax.vhd:58:28  */
-  assign alua = n528_o; // (signal)
+  assign regD = n808_data; // (signal)
   /* .\minimax.vhd:58:34  */
-  assign alub = n644_o; // (signal)
   /* .\minimax.vhd:174:21  */
-  assign alus = n646_o; // (signal)
+  assign aluS = n646_o; // (signal)
   /* .\minimax.vhd:58:46  */
-  assign alux = n690_o; // (signal)
+  assign aluX = n690_o; // (signal)
   /* .\minimax.vhd:64:16  */
   always @*
     agux = n757_o; // (isignal)
@@ -637,13 +392,13 @@ module minimax (
   /* .\minimax.vhd:179:48  */
   assign n293_o = {pc_fetch, 1'b0};
   /* .\minimax.vhd:184:41  */
-  assign n295_o = |(regs);
+  assign n295_o = |(regS);
   /* .\minimax.vhd:184:41  */
   assign n296_o = ~n295_o;
   /* .\minimax.vhd:184:36  */
   assign n297_o = op16_beqz & n296_o;
   /* .\minimax.vhd:185:36  */
-  assign n298_o = |(regs);
+  assign n298_o = |(regS);
   /* .\minimax.vhd:185:31  */
   assign n299_o = op16_bnez & n298_o;
   /* .\minimax.vhd:185:17  */
@@ -675,473 +430,12 @@ module minimax (
     n343_q <= n328_o;
   initial
     n343_q = 1'b1;
-  /* .\minimax.vhd:234:57  */
-  assign n367_o = dly16_slli_setrd | dly16_lw;
-  /* .\minimax.vhd:234:69  */
-  assign n368_o = n367_o | dly16_lwsp;
-  /* .\minimax.vhd:234:35  */
-  assign n369_o = {{4{n368_o}}, n368_o}; // sext
-  /* .\minimax.vhd:234:35  */
-  assign n370_o = dra & n369_o;
-  /* .\minimax.vhd:235:51  */
-  assign n371_o = op16_jal | op16_jalr;
-  /* .\minimax.vhd:235:64  */
-  assign n372_o = n371_o | trap;
-  /* .\minimax.vhd:235:37  */
-  assign n374_o = {{4{n372_o}}, n372_o}; // sext
-  /* .\minimax.vhd:235:37  */
-  assign n375_o = 5'b00001 & n374_o;
-  /* .\minimax.vhd:235:25  */
-  assign n376_o = n370_o | n375_o;
-  /* .\minimax.vhd:236:41  */
-  assign n377_o = inst[4:2];
-  /* .\minimax.vhd:236:35  */
-  assign n379_o = {2'b01, n377_o};
-  /* .\minimax.vhd:236:74  */
-  assign n380_o = op16_addi4spn | op16_sw;
-  /* .\minimax.vhd:236:55  */
-  assign n381_o = {{4{n380_o}}, n380_o}; // sext
-  /* .\minimax.vhd:236:55  */
-  assign n382_o = n379_o & n381_o;
-  /* .\minimax.vhd:236:25  */
-  assign n383_o = n376_o | n382_o;
-  /* .\minimax.vhd:237:33  */
-  assign n384_o = inst[6:2];
-  /* .\minimax.vhd:237:46  */
-  assign n385_o = {{4{op16_swsp}}, op16_swsp}; // sext
-  /* .\minimax.vhd:237:46  */
-  assign n386_o = n384_o & n385_o;
-  /* .\minimax.vhd:237:25  */
-  assign n387_o = n383_o | n386_o;
-  /* .\minimax.vhd:238:62  */
-  assign n389_o = op16_addi | op16_add;
-  /* .\minimax.vhd:239:49  */
-  assign n390_o = ~dly16_slli_setrd;
-  /* .\minimax.vhd:239:45  */
-  assign n391_o = op16_mv & n390_o;
-  /* .\minimax.vhd:239:33  */
-  assign n392_o = n389_o | n391_o;
-  /* .\minimax.vhd:240:33  */
-  assign n393_o = n392_o | op16_addi16sp;
-  /* .\minimax.vhd:241:33  */
-  assign n394_o = n393_o | op16_slli_setrd;
-  /* .\minimax.vhd:241:52  */
-  assign n395_o = n394_o | op16_slli_setrs;
-  /* .\minimax.vhd:242:33  */
-  assign n396_o = n395_o | op16_li;
-  /* .\minimax.vhd:242:44  */
-  assign n397_o = n396_o | op16_lui;
-  /* .\minimax.vhd:244:41  */
-  assign n402_o = inst[9:7];
-  /* .\minimax.vhd:244:35  */
-  assign n404_o = {2'b01, n402_o};
-  /* .\minimax.vhd:245:33  */
-  assign n405_o = op16_sub | op16_xor;
-  /* .\minimax.vhd:245:45  */
-  assign n406_o = n405_o | op16_or;
-  /* .\minimax.vhd:245:56  */
-  assign n407_o = n406_o | op16_and;
-  /* .\minimax.vhd:245:68  */
-  assign n408_o = n407_o | op16_andi;
-  /* .\minimax.vhd:246:33  */
-  assign n409_o = n408_o | op16_srli;
-  /* .\minimax.vhd:246:46  */
-  assign n410_o = n409_o | op16_srai;
-  /* .\minimax.vhd:244:55  */
-  assign n411_o = {{4{n410_o}}, n410_o}; // sext
-  /* .\minimax.vhd:244:55  */
-  assign n412_o = n404_o & n411_o;
-  /* .\minimax.vhd:244:25  */
-  /* .\minimax.vhd:249:35  */
-  assign n414_o = {{4{dly16_slli_setrs}}, dly16_slli_setrs}; // sext
-  /* .\minimax.vhd:249:35  */
-  assign n415_o = dra & n414_o;
-  /* .\minimax.vhd:250:56  */
-  assign n416_o = op16_addi4spn | op16_lwsp;
-  /* .\minimax.vhd:250:69  */
-  assign n417_o = n416_o | op16_swsp;
-  /* .\minimax.vhd:250:37  */
-  assign n419_o = {{4{n417_o}}, n417_o}; // sext
-  /* .\minimax.vhd:250:37  */
-  assign n420_o = 5'b00010 & n419_o;
-  /* .\minimax.vhd:250:25  */
-  assign n421_o = n415_o | n420_o;
-  /* .\minimax.vhd:251:33  */
-  assign n422_o = inst[11:7];
-  /* .\minimax.vhd:251:60  */
-  assign n423_o = op16_jr | op16_jalr;
-  /* .\minimax.vhd:251:73  */
-  assign n424_o = n423_o | op16_slli_thunk;
-  /* .\minimax.vhd:251:92  */
-  assign n425_o = n424_o | op16_slli;
-  /* .\minimax.vhd:251:47  */
-  assign n426_o = {{4{n425_o}}, n425_o}; // sext
-  /* .\minimax.vhd:251:47  */
-  assign n427_o = n422_o & n426_o;
-  /* .\minimax.vhd:251:25  */
-  assign n428_o = n421_o | n427_o;
-  /* .\minimax.vhd:252:41  */
-  assign n429_o = inst[9:7];
-  /* .\minimax.vhd:252:35  */
-  assign n431_o = {2'b01, n429_o};
-  /* .\minimax.vhd:252:68  */
-  assign n432_o = op16_sw | op16_lw;
-  /* .\minimax.vhd:252:79  */
-  assign n433_o = n432_o | op16_beqz;
-  /* .\minimax.vhd:252:92  */
-  assign n434_o = n433_o | op16_bnez;
-  /* .\minimax.vhd:252:55  */
-  assign n435_o = {{4{n434_o}}, n434_o}; // sext
-  /* .\minimax.vhd:252:55  */
-  assign n436_o = n431_o & n435_o;
-  /* .\minimax.vhd:252:25  */
-  assign n437_o = n428_o | n436_o;
-  /* .\minimax.vhd:253:41  */
-  assign n438_o = inst[4:2];
-  /* .\minimax.vhd:253:35  */
-  assign n440_o = {2'b01, n438_o};
-  /* .\minimax.vhd:253:69  */
-  assign n441_o = op16_and | op16_or;
-  /* .\minimax.vhd:253:80  */
-  assign n442_o = n441_o | op16_xor;
-  /* .\minimax.vhd:253:92  */
-  assign n443_o = n442_o | op16_sub;
-  /* .\minimax.vhd:253:55  */
-  assign n444_o = {{4{n443_o}}, n443_o}; // sext
-  /* .\minimax.vhd:253:55  */
-  assign n445_o = n440_o & n444_o;
-  /* .\minimax.vhd:253:25  */
-  assign n446_o = n437_o | n445_o;
-  /* .\minimax.vhd:254:33  */
-  assign n447_o = inst[6:2];
-  /* .\minimax.vhd:254:64  */
-  assign n448_o = ~dly16_slli_setrs;
-  /* .\minimax.vhd:254:60  */
-  assign n449_o = op16_mv & n448_o;
-  /* .\minimax.vhd:254:86  */
-  assign n450_o = n449_o | op16_add;
-  /* .\minimax.vhd:254:46  */
-  assign n451_o = {{4{n450_o}}, n450_o}; // sext
-  /* .\minimax.vhd:254:46  */
-  assign n452_o = n447_o & n451_o;
-  /* .\minimax.vhd:257:32  */
-  assign n454_o = microcode ^ dly16_slli_setrd;
-  /* .\minimax.vhd:264:37  */
-  assign n468_o = op16_add | op16_addi;
-  /* .\minimax.vhd:264:50  */
-  assign n469_o = n468_o | op16_sub;
-  /* .\minimax.vhd:265:25  */
-  assign n470_o = n469_o | op16_and;
-  /* .\minimax.vhd:265:37  */
-  assign n471_o = n470_o | op16_andi;
-  /* .\minimax.vhd:266:25  */
-  assign n472_o = n471_o | op16_or;
-  /* .\minimax.vhd:266:36  */
-  assign n473_o = n472_o | op16_xor;
-  /* .\minimax.vhd:267:25  */
-  assign n474_o = n473_o | op16_addi16sp;
-  /* .\minimax.vhd:268:25  */
-  assign n475_o = n474_o | op16_slli;
-  /* .\minimax.vhd:268:38  */
-  assign n476_o = n475_o | op16_srli;
-  /* .\minimax.vhd:268:51  */
-  assign n477_o = n476_o | op16_srai;
-  /* .\minimax.vhd:264:23  */
-  assign n478_o = {{31{n477_o}}, n477_o}; // sext
-  /* .\minimax.vhd:264:23  */
-  assign n479_o = regd & n478_o;
-  /* .\minimax.vhd:269:35  */
-  assign n480_o = inst[10:7];
-  /* .\minimax.vhd:269:29  */
-  assign n482_o = {22'b0000000000000000000000, n480_o};
-  /* .\minimax.vhd:269:55  */
-  assign n483_o = inst[12:11];
-  /* .\minimax.vhd:269:49  */
-  assign n484_o = {n482_o, n483_o};
-  /* .\minimax.vhd:269:76  */
-  assign n485_o = inst[5];
-  /* .\minimax.vhd:269:70  */
-  assign n486_o = {n484_o, n485_o};
-  /* .\minimax.vhd:269:86  */
-  assign n487_o = inst[6];
-  /* .\minimax.vhd:269:80  */
-  assign n488_o = {n486_o, n487_o};
-  /* .\minimax.vhd:269:90  */
-  assign n490_o = {n488_o, 2'b00};
-  /* .\minimax.vhd:269:98  */
-  assign n491_o = {{31{op16_addi4spn}}, op16_addi4spn}; // sext
-  /* .\minimax.vhd:269:98  */
-  assign n492_o = n490_o & n491_o;
-  /* .\minimax.vhd:269:17  */
-  assign n493_o = n479_o | n492_o;
-  /* .\minimax.vhd:270:66  */
-  assign n494_o = inst[8:7];
-  /* .\minimax.vhd:270:60  */
-  assign n496_o = {24'b000000000000000000000000, n494_o};
-  /* .\minimax.vhd:270:85  */
-  assign n497_o = inst[12:9];
-  /* .\minimax.vhd:270:79  */
-  assign n498_o = {n496_o, n497_o};
-  /* .\minimax.vhd:270:99  */
-  assign n500_o = {n498_o, 2'b00};
-  /* .\minimax.vhd:270:107  */
-  assign n501_o = {{31{op16_swsp}}, op16_swsp}; // sext
-  /* .\minimax.vhd:270:107  */
-  assign n502_o = n500_o & n501_o;
-  /* .\minimax.vhd:270:17  */
-  assign n503_o = n493_o | n502_o;
-  /* .\minimax.vhd:271:66  */
-  assign n504_o = inst[3:2];
-  /* .\minimax.vhd:271:60  */
-  assign n506_o = {24'b000000000000000000000000, n504_o};
-  /* .\minimax.vhd:271:85  */
-  assign n507_o = inst[12];
-  /* .\minimax.vhd:271:79  */
-  assign n508_o = {n506_o, n507_o};
-  /* .\minimax.vhd:271:96  */
-  assign n509_o = inst[6:4];
-  /* .\minimax.vhd:271:90  */
-  assign n510_o = {n508_o, n509_o};
-  /* .\minimax.vhd:271:109  */
-  assign n512_o = {n510_o, 2'b00};
-  /* .\minimax.vhd:271:117  */
-  assign n513_o = {{31{op16_lwsp}}, op16_lwsp}; // sext
-  /* .\minimax.vhd:271:117  */
-  assign n514_o = n512_o & n513_o;
-  /* .\minimax.vhd:271:17  */
-  assign n515_o = n503_o | n514_o;
-  /* .\minimax.vhd:272:35  */
-  assign n516_o = inst[5];
-  /* .\minimax.vhd:272:29  */
-  assign n518_o = {25'b0000000000000000000000000, n516_o};
-  /* .\minimax.vhd:272:45  */
-  assign n519_o = inst[12:10];
-  /* .\minimax.vhd:272:39  */
-  assign n520_o = {n518_o, n519_o};
-  /* .\minimax.vhd:272:66  */
-  assign n521_o = inst[6];
-  /* .\minimax.vhd:272:60  */
-  assign n522_o = {n520_o, n521_o};
-  /* .\minimax.vhd:272:70  */
-  assign n524_o = {n522_o, 2'b00};
-  /* .\minimax.vhd:272:91  */
-  assign n525_o = op16_lw | op16_sw;
-  /* .\minimax.vhd:272:78  */
-  assign n526_o = {{31{n525_o}}, n525_o}; // sext
-  /* .\minimax.vhd:272:78  */
-  assign n527_o = n524_o & n526_o;
-  /* .\minimax.vhd:272:17  */
-  assign n528_o = n515_o | n527_o;
-  /* .\minimax.vhd:275:59  */
-  assign n529_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n530_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n531_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n532_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n533_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n534_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n535_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n536_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n537_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n538_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n539_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n540_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n541_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n542_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n543_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n544_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n545_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n546_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n547_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n548_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n549_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n550_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n551_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n552_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n553_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n554_o = inst[12];
-  /* .\minimax.vhd:275:59  */
-  assign n555_o = inst[12];
-  assign n556_o = {n555_o, n554_o, n553_o, n552_o};
-  assign n557_o = {n551_o, n550_o, n549_o, n548_o};
-  assign n558_o = {n547_o, n546_o, n545_o, n544_o};
-  assign n559_o = {n543_o, n542_o, n541_o, n540_o};
-  assign n560_o = {n539_o, n538_o, n537_o, n536_o};
-  assign n561_o = {n535_o, n534_o, n533_o, n532_o};
-  assign n562_o = {n531_o, n530_o, n529_o};
-  assign n563_o = {n556_o, n557_o, n558_o, n559_o};
-  assign n564_o = {n560_o, n561_o, n562_o};
-  assign n565_o = {n563_o, n564_o};
-  /* .\minimax.vhd:275:71  */
-  assign n566_o = inst[6:2];
-  /* .\minimax.vhd:275:65  */
-  assign n567_o = {n565_o, n566_o};
-  /* .\minimax.vhd:275:100  */
-  assign n568_o = op16_addi | op16_andi;
-  /* .\minimax.vhd:275:113  */
-  assign n569_o = n568_o | op16_li;
-  /* .\minimax.vhd:275:85  */
-  assign n570_o = {{31{n569_o}}, n569_o}; // sext
-  /* .\minimax.vhd:275:85  */
-  assign n571_o = n567_o & n570_o;
-  /* .\minimax.vhd:275:17  */
-  assign n572_o = regs | n571_o;
-  /* .\minimax.vhd:276:60  */
-  assign n573_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n574_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n575_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n576_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n577_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n578_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n579_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n580_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n581_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n582_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n583_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n584_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n585_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n586_o = inst[12];
-  /* .\minimax.vhd:276:60  */
-  assign n587_o = inst[12];
-  assign n588_o = {n587_o, n586_o, n585_o, n584_o};
-  assign n589_o = {n583_o, n582_o, n581_o, n580_o};
-  assign n590_o = {n579_o, n578_o, n577_o, n576_o};
-  assign n591_o = {n575_o, n574_o, n573_o};
-  assign n592_o = {n588_o, n589_o, n590_o, n591_o};
-  /* .\minimax.vhd:276:72  */
-  assign n593_o = inst[6:2];
-  /* .\minimax.vhd:276:66  */
-  assign n594_o = {n592_o, n593_o};
-  /* .\minimax.vhd:276:85  */
-  assign n596_o = {n594_o, 12'b000000000000};
-  /* .\minimax.vhd:276:95  */
-  assign n597_o = {{31{op16_lui}}, op16_lui}; // sext
-  /* .\minimax.vhd:276:95  */
-  assign n598_o = n596_o & n597_o;
-  /* .\minimax.vhd:276:17  */
-  assign n599_o = n572_o | n598_o;
-  /* .\minimax.vhd:277:59  */
-  assign n600_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n601_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n602_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n603_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n604_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n605_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n606_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n607_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n608_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n609_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n610_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n611_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n612_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n613_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n614_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n615_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n616_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n617_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n618_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n619_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n620_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n621_o = inst[12];
-  /* .\minimax.vhd:277:59  */
-  assign n622_o = inst[12];
-  assign n623_o = {n622_o, n621_o, n620_o, n619_o};
-  assign n624_o = {n618_o, n617_o, n616_o, n615_o};
-  assign n625_o = {n614_o, n613_o, n612_o, n611_o};
-  assign n626_o = {n610_o, n609_o, n608_o, n607_o};
-  assign n627_o = {n606_o, n605_o, n604_o, n603_o};
-  assign n628_o = {n602_o, n601_o, n600_o};
-  assign n629_o = {n623_o, n624_o, n625_o, n626_o};
-  assign n630_o = {n627_o, n628_o};
-  assign n631_o = {n629_o, n630_o};
-  /* .\minimax.vhd:277:71  */
-  assign n632_o = inst[4:3];
-  /* .\minimax.vhd:277:65  */
-  assign n633_o = {n631_o, n632_o};
-  /* .\minimax.vhd:277:90  */
-  assign n634_o = inst[5];
-  /* .\minimax.vhd:277:84  */
-  assign n635_o = {n633_o, n634_o};
-  /* .\minimax.vhd:277:100  */
-  assign n636_o = inst[2];
-  /* .\minimax.vhd:277:94  */
-  assign n637_o = {n635_o, n636_o};
-  /* .\minimax.vhd:277:110  */
-  assign n638_o = inst[6];
-  /* .\minimax.vhd:277:104  */
-  assign n639_o = {n637_o, n638_o};
-  /* .\minimax.vhd:277:114  */
-  assign n641_o = {n639_o, 4'b0000};
-  /* .\minimax.vhd:277:122  */
-  assign n642_o = {{31{op16_addi16sp}}, op16_addi16sp}; // sext
-  /* .\minimax.vhd:277:122  */
-  assign n643_o = n641_o & n642_o;
-  /* .\minimax.vhd:277:17  */
-  assign n644_o = n599_o | n643_o;
   /* .\minimax.vhd:280:47  */
-  assign n645_o = alua - alub;
+  assign n645_o = aluA - aluB;
   /* .\minimax.vhd:280:63  */
   assign n646_o = op16_sub ? n645_o : n647_o;
   /* .\minimax.vhd:281:52  */
-  assign n647_o = alua + alub;
+  assign n647_o = aluA + aluB;
   /* .\minimax.vhd:284:34  */
   assign n648_o = op16_add | op16_sub;
   /* .\minimax.vhd:284:46  */
@@ -1159,13 +453,13 @@ module minimax (
   /* .\minimax.vhd:283:23  */
   assign n655_o = {{31{n654_o}}, n654_o}; // sext
   /* .\minimax.vhd:283:23  */
-  assign n656_o = alus & n655_o;
+  assign n656_o = aluS & n655_o;
   /* .\minimax.vhd:288:38  */
-  assign n657_o = alua[31];
+  assign n657_o = aluA[31];
   /* .\minimax.vhd:288:30  */
   assign n658_o = op16_srai & n657_o;
   /* .\minimax.vhd:288:50  */
-  assign n659_o = alua[31:1];
+  assign n659_o = aluA[31:1];
   /* .\minimax.vhd:288:44  */
   assign n660_o = {n658_o, n659_o};
   /* .\minimax.vhd:288:80  */
@@ -1177,7 +471,7 @@ module minimax (
   /* .\minimax.vhd:287:40  */
   assign n664_o = n656_o | n663_o;
   /* .\minimax.vhd:289:24  */
-  assign n665_o = alua & alub;
+  assign n665_o = aluA & aluB;
   /* .\minimax.vhd:289:49  */
   assign n666_o = op16_andi | op16_and;
   /* .\minimax.vhd:289:34  */
@@ -1187,7 +481,7 @@ module minimax (
   /* .\minimax.vhd:288:95  */
   assign n669_o = n664_o | n668_o;
   /* .\minimax.vhd:290:24  */
-  assign n670_o = alua ^ alub;
+  assign n670_o = aluA ^ aluB;
   /* .\minimax.vhd:290:34  */
   assign n671_o = {{31{op16_xor}}, op16_xor}; // sext
   /* .\minimax.vhd:290:34  */
@@ -1195,7 +489,7 @@ module minimax (
   /* .\minimax.vhd:289:63  */
   assign n673_o = n669_o | n672_o;
   /* .\minimax.vhd:291:24  */
-  assign n674_o = alua | alub;
+  assign n674_o = aluA | aluB;
   /* .\minimax.vhd:291:46  */
   assign n675_o = op16_or | op16_mv;
   /* .\minimax.vhd:291:33  */
@@ -1251,7 +545,7 @@ module minimax (
   /* .\minimax.vhd:297:17  */
   assign n702_o = n694_o | n701_o;
   /* .\minimax.vhd:299:31  */
-  assign n703_o = regs[11:1];
+  assign n703_o = regS[11:1];
   /* .\minimax.vhd:299:58  */
   assign n704_o = op16_jr | op16_jalr;
   /* .\minimax.vhd:299:71  */
@@ -1396,26 +690,56 @@ module minimax (
   /* .\minimax.vhd:315:40  */
   assign n776_o = n775_o | op16_srai;
   /* .\minimax.vhd:321:37  */
-  assign n779_o = addrd[4:0];
+  assign n779_o = addrD[4:0];
   /* .\minimax.vhd:321:29  */
   assign n780_o = |(n779_o);
   /* .\minimax.vhd:321:51  */
   assign n781_o = n780_o & wb;
 
   // READ/WRITE register file port
-  assign addrd_port = (n387_o |
-    (inst[11:7] & ({5{n397_o | op16_slli}}))) |
-          n412_o;
+  assign addrd_port = (dra & {5{dly16_slli_setrd | dly16_lw | dly16_lwsp}})
+    | (5'b00001 & {5{op16_jal | op16_jalr | trap}}) // write return address into ra
+    | ({2'b01, inst[4:2]} & {5{op16_addi4spn | op16_sw}}) // data
+    | (inst[6:2] & {5{op16_swsp}})
+    | (inst[11:7] & ({5{op16_addi | op16_add
+        | (op16_mv & ~dly16_slli_setrd)
+        | op16_addi16sp
+        | op16_slli_setrd | op16_slli_setrs
+        | op16_li | op16_lui
+        | op16_slli}}))
+    | ({2'b01, inst[9:7]} & {5{op16_sub
+        | op16_xor | op16_or | op16_and | op16_andi
+        | op16_srli | op16_srai}});
 
   // READ-ONLY register file port
-  assign addrs_port = n446_o | n452_o;
+  assign addrs_port = (dra & {5{dly16_slli_setrs}})
+      | (5'b00010 & {5{op16_addi4spn | op16_lwsp | op16_swsp}})
+      | (inst[11:7] & {5{op16_jr | op16_jalr | op16_slli_thunk | op16_slli}})
+      | ({2'b01, inst[9:7]} & {5{op16_sw | op16_lw | op16_beqz | op16_bnez}})
+      | ({2'b01, inst[4:2]} & {5{op16_and | op16_or | op16_xor | op16_sub}})
+      | (inst[6:2] & {5{op16_mv & ~dly16_slli_setrs | op16_add}});
 
   // Select between "normal" and "microcode" register banks.
   assign rs_banksel = (microcode ^ dly16_slli_setrs) | trap;
   assign rd_banksel = (microcode ^ dly16_slli_setrd) | trap;
 
-  assign addrd = {rd_banksel, addrd_port};
-  assign addrs = {rs_banksel, addrs_port};
+  assign addrD = {rd_banksel, addrd_port};
+  assign addrS = {rs_banksel, addrs_port};
+
+  assign aluA = (regD & {32{op16_add | op16_addi | op16_sub
+                    | op16_and | op16_andi
+                    | op16_or | op16_xor
+                    | op16_addi16sp
+                    | op16_slli | op16_srli | op16_srai}})
+          | ({22'b0000000000000000000000, inst[10:7], inst[12:11], inst[5], inst[6], 2'b00} & {32{op16_addi4spn}})
+          | ({24'b000000000000000000000000, inst[8:7], inst[12:9], 2'b00} & {32{op16_swsp}})
+          | ({24'b000000000000000000000000, inst[3:2], inst[12], inst[6:4], 2'b00} & {32{op16_lwsp}})
+          | ({25'b0000000000000000000000000, inst[5], inst[12:10], inst[6], 2'b00} & {32{op16_lw | op16_sw}});
+
+  assign aluB = regS
+          | ({{27{inst[12]}}, inst[6:2]} & {32{op16_addi | op16_andi | op16_li}})
+          | ({{15{inst[12]}}, inst[6:2], 12'b000000000000} & {32{op16_lui}})
+          | ({{23{inst[12]}}, inst[4:3], inst[5], inst[2], inst[6], 4'b0000} & {32{op16_addi16sp}});
 
   // Fetch Process
   always @(posedge clk) begin
@@ -1462,7 +786,7 @@ module minimax (
 
     // Load and setrs/setrd instructions complete a cycle after they are
     // initiated, so we need to keep some state.
-    dra <= (regd[4:0] & ({5{op16_slli_setrd | op16_slli_setrs}})) |
+    dra <= (regD[4:0] & ({5{op16_slli_setrd | op16_slli_setrs}})) |
            (({2'b01, inst[4:2]}) & ({5{op16_lw}})) |
            inst[11:7] & {5{op16_lwsp | op32}};
 
@@ -1543,11 +867,11 @@ module minimax (
     register_file[1] = 32'b00000000000000000000000000000000;
     register_file[0] = 32'b00000000000000000000000000000000;
     end
-  assign n807_data = register_file[addrs];
-  assign n808_data = register_file[addrd];
+  assign n807_data = register_file[addrS];
+  assign n808_data = register_file[addrD];
   always @(posedge clk)
     if (n781_o)
-      register_file[addrd] <= alux;
+      register_file[addrD] <= aluX;
   /* .\minimax.vhd:262:31  */
   /* .\minimax.vhd:261:31  */
   /* .\minimax.vhd:322:47  */
