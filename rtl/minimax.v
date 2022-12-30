@@ -14,39 +14,52 @@ module minimax #(
    output reg [31:0] wdata,
    output reg [3:0] wmask,
    output reg rreq);
-  wire [5:0] addrS;
-  wire [5:0] addrD;
-  wire [31:0] regS;
-  wire [31:0] regD;
-  wire [31:0] aluA;
-  wire [31:0] aluB;
-  wire [31:0] aluS;
-  wire [31:0] aluX;
-  wire [10:0] aguA;
-  wire [10:0] aguB;
-  wire [10:0] aguX;
+
+  // Register file
+  (* ram_style = "distributed" *) reg [31:0] register_file[63:0] ;
+
+  // Register file address ports
+  wire [5:0] addrS, addrD;
+  wire [4:0] addrD_port, addrS_port;
+  wire bD_banksel, bS_banksel;
+  wire [31:0] regS, regD, aluA, aluB, aluS, aluX;
+
+  // Program counter
+  reg [10:0] pc_fetch, pc_fetch_dly, pc_execute;
+
+  // PC ALU output
+  wire [10:0] aguA, aguB, aguX;
+
+  // Track bubbles and execution inhibits through the pipeline.
+  reg bubble, bubble1, bubble2;
+  reg branch_taken, microcode;
+  reg trap, op16_trap, op32_trap;
+
+  // Writeback and deferred writeback strobes
   wire wb;
-  reg [10:0] pc_fetch;
-  reg [10:0] pc_fetch_dly;
-  reg [10:0] pc_execute;
-  reg bubble;
-  reg bubble1;
-  reg bubble2;
-  reg microcode;
-  reg trap;
-  reg op16_trap;
-  reg op32_trap;
   reg [4:0] dra;
+
+  // Opcode masks for 16-bit instructions
+  wire [15:0] inst_type_masked;
+  wire [15:0] inst_type_masked_i16;
+  wire [15:0] inst_type_masked_sr;
+  wire [15:0] inst_type_masked_and;
+  wire [15:0] inst_type_masked_op;
+  wire [15:0] inst_type_masked_j;
+  wire [15:0] inst_type_masked_mj;
+
+  // Strobes for 16-bit instructions
   reg op16;
   reg op16_addi4spn;
-  reg op16_lw;
-  reg dly16_lw;
+  reg op16_lw, dly16_lw;
   reg op16_sw;
+
   reg op16_addi;
   reg op16_jal;
   reg op16_li;
   reg op16_addi16sp;
   reg op16_lui;
+
   reg op16_srli;
   reg op16_srai;
   reg op16_andi;
@@ -57,71 +70,67 @@ module minimax #(
   reg op16_j;
   reg op16_beqz;
   reg op16_bnez;
+
   reg op16_slli;
-  reg op16_lwsp;
-  reg dly16_lwsp;
+  reg op16_lwsp, dly16_lwsp;
   reg op16_jr;
   reg op16_mv;
+
   reg op16_ebreak;
   reg op16_jalr;
   reg op16_add;
   reg op16_swsp;
-  reg op16_slli_setrd;
-  reg dly16_slli_setrd;
-  reg op16_slli_setrs;
-  reg dly16_slli_setrs;
+
+  reg op16_slli_setrd, dly16_slli_setrd;
+  reg op16_slli_setrs, dly16_slli_setrs;
   reg op16_slli_thunk;
+
+  // Strobes for 32-bit instructions
   reg op32;
-  wire [15:0] inst_type_masked;
-  wire [15:0] inst_type_masked_i16;
-  wire [15:0] inst_type_masked_sr;
-  wire [15:0] inst_type_masked_and;
-  wire [15:0] inst_type_masked_op;
-  wire [15:0] inst_type_masked_j;
-  wire [15:0] inst_type_masked_mj;
 
-  wire rd_banksel;
-  wire rs_banksel;
-
-  reg branch_taken;
-  wire [4:0] addrd_port;
-  wire [4:0] addrs_port;
+  assign inst_type_masked     = inst & 16'b111_0_00000_00000_11;
+  assign inst_type_masked_i16 = inst & 16'b111_0_11111_00000_11;
+  assign inst_type_masked_sr  = inst & 16'b111_1_11000_11111_11;
+  assign inst_type_masked_and = inst & 16'b111_0_11000_00000_11;
+  assign inst_type_masked_op  = inst & 16'b111_0_11000_11000_11;
+  assign inst_type_masked_j   = inst & 16'b111_1_00000_11111_11;
+  assign inst_type_masked_mj  = inst & 16'b111_1_00000_00000_11;
 
   always @* begin
-    op16_addi4spn   = (inst_type_masked     == 16'b0000000000000000) & ~bubble;
-    op16_lw         = (inst_type_masked     == 16'b0100000000000000) & ~bubble;
-    op16_sw         = (inst_type_masked     == 16'b1100000000000000) & ~bubble;
+    op16_addi4spn   = (inst_type_masked     == 16'b000_0_00000_00000_00) & ~bubble;
+    op16_lw         = (inst_type_masked     == 16'b010_0_00000_00000_00) & ~bubble;
+    op16_sw         = (inst_type_masked     == 16'b110_0_00000_00000_00) & ~bubble;
   
-    op16_addi       = (inst_type_masked     == 16'b0000000000000001) & ~bubble;
-    op16_jal        = (inst_type_masked     == 16'b0010000000000001) & ~bubble;
-    op16_li         = (inst_type_masked     == 16'b0100000000000001) & ~bubble;
-    op16_addi16sp   = (inst_type_masked_i16 == 16'b0110000100000001) & ~bubble;
-    op16_lui        = (inst_type_masked     == 16'b0110000000000001) & ~bubble & ~op16_addi16sp;
+    op16_addi       = (inst_type_masked     == 16'b000_0_00000_00000_01) & ~bubble;
+    op16_jal        = (inst_type_masked     == 16'b001_0_00000_00000_01) & ~bubble;
+    op16_li         = (inst_type_masked     == 16'b010_0_00000_00000_01) & ~bubble;
+    op16_addi16sp   = (inst_type_masked_i16 == 16'b011_0_00010_00000_01) & ~bubble;
+    op16_lui        = (inst_type_masked     == 16'b011_0_00000_00000_01) & ~bubble & ~op16_addi16sp;
       
-    op16_srli       = (inst_type_masked_sr  == 16'b1000000000000101) & ~bubble;
-    op16_srai       = (inst_type_masked_sr  == 16'b1000010000000101) & ~bubble;
-    op16_andi       = (inst_type_masked_and == 16'b1000100000000001) & ~bubble;
-    op16_sub        = (inst_type_masked_op  == 16'b1000110000000001) & ~bubble;
-    op16_xor        = (inst_type_masked_op  == 16'b1000110000100001) & ~bubble;
-    op16_or         = (inst_type_masked_op  == 16'b1000110001000001) & ~bubble;
-    op16_and        = (inst_type_masked_op  == 16'b1000110001100001) & ~bubble;
-    op16_j          = (inst_type_masked     == 16'b1010000000000001) & ~bubble;
-    op16_beqz       = (inst_type_masked     == 16'b1100000000000001) & ~bubble;
-    op16_bnez       = (inst_type_masked     == 16'b1110000000000001) & ~bubble;
+    op16_srli       = (inst_type_masked_sr  == 16'b100_0_00000_00001_01) & ~bubble;
+    op16_srai       = (inst_type_masked_sr  == 16'b100_0_01000_00001_01) & ~bubble;
+    op16_andi       = (inst_type_masked_and == 16'b100_0_10000_00000_01) & ~bubble;
+    op16_sub        = (inst_type_masked_op  == 16'b100_0_11000_00000_01) & ~bubble;
+    op16_xor        = (inst_type_masked_op  == 16'b100_0_11000_01000_01) & ~bubble;
+    op16_or         = (inst_type_masked_op  == 16'b100_0_11000_10000_01) & ~bubble;
+    op16_and        = (inst_type_masked_op  == 16'b100_0_11000_11000_01) & ~bubble;
+    op16_j          = (inst_type_masked     == 16'b101_0_00000_00000_01) & ~bubble;
+    op16_beqz       = (inst_type_masked     == 16'b110_0_00000_00000_01) & ~bubble;
+    op16_bnez       = (inst_type_masked     == 16'b111_0_00000_00000_01) & ~bubble;
   
-    op16_slli       = (inst_type_masked_j   == 16'b0000000000000110) & ~bubble;
-    op16_lwsp       = (inst_type_masked     == 16'b0100000000000010) & ~bubble;
-    op16_jr         = (inst_type_masked_j   == 16'b1000000000000010) & ~bubble;
-    op16_mv         = (inst_type_masked_mj  == 16'b1000000000000010) & ~bubble & ~op16_jr;
-    op16_ebreak     = (inst                 == 16'b1001000000000010) & ~bubble;
-    op16_jalr       = (inst_type_masked_j   == 16'b1001000000000010) & ~bubble & ~op16_ebreak;
-    op16_add        = (inst_type_masked_mj  == 16'b1001000000000010) & ~bubble & ~op16_jalr & ~ op16_ebreak;
-    op16_swsp       = (inst_type_masked     == 16'b1100000000000010) & ~bubble;
+    op16_slli       = (inst_type_masked_j   == 16'b000_0_00000_00001_10) & ~bubble;
+    op16_lwsp       = (inst_type_masked     == 16'b010_0_00000_00000_10) & ~bubble;
+    op16_jr         = (inst_type_masked_j   == 16'b100_0_00000_00000_10) & ~bubble;
+    op16_mv         = (inst_type_masked_mj  == 16'b100_0_00000_00000_10) & ~bubble & ~op16_jr;
+    op16_ebreak     = (inst                 == 16'b100_1_00000_00000_10) & ~bubble;
+    op16_jalr       = (inst_type_masked_j   == 16'b100_1_00000_00000_10) & ~bubble & ~op16_ebreak;
+    op16_add        = (inst_type_masked_mj  == 16'b100_1_00000_00000_10) & ~bubble & ~op16_jalr & ~ op16_ebreak;
+    op16_swsp       = (inst_type_masked     == 16'b110_0_00000_00000_10) & ~bubble;
 
     // Non-standard extensions to support microcode are permitted in these opcode gaps
-    op16_slli_setrd = (inst_type_masked_j   == 16'b0001000000000110) & ~bubble;
-    op16_slli_setrs = (inst_type_masked_j   == 16'b0001000000001010) & ~bubble;
-    op16_slli_thunk = (inst_type_masked_j   == 16'b0001000000010010) & ~bubble;
+    op16_slli_setrd = (inst_type_masked_j   == 16'b000_1_00000_00001_10) & ~bubble;
+    op16_slli_setrs = (inst_type_masked_j   == 16'b000_1_00000_00010_10) & ~bubble;
+    op16_slli_thunk = (inst_type_masked_j   == 16'b000_1_00000_00100_10) & ~bubble;
 
     // Blanket matches for RVC and RV32I instructions
     op32 = &(inst[1:0]) & ~bubble;
@@ -197,16 +206,9 @@ module minimax #(
 
     bubble = 1'b1;
   end
-  assign inst_type_masked = inst & 16'b1110000000000011;
-  assign inst_type_masked_i16 = inst & 16'b1110111110000011;
-  assign inst_type_masked_sr = inst & 16'b1111110001111111;
-  assign inst_type_masked_and = inst & 16'b1110110000000011;
-  assign inst_type_masked_op = inst & 16'b1110110001100011;
-  assign inst_type_masked_j = inst & 16'b1111000001111111;
-  assign inst_type_masked_mj = inst & 16'b1111000000000011;
   
   // READ/WRITE register file port
-  assign addrd_port = (dra & {5{dly16_slli_setrd | dly16_lw | dly16_lwsp}})
+  assign addrD_port = (dra & {5{dly16_slli_setrd | dly16_lw | dly16_lwsp}})
     | (5'b00001 & {5{op16_jal | op16_jalr | trap}}) // write return address into ra
     | ({2'b01, inst[4:2]} & {5{op16_addi4spn | op16_sw}}) // data
     | (inst[6:2] & {5{op16_swsp}})
@@ -221,7 +223,7 @@ module minimax #(
         | op16_srli | op16_srai}});
 
   // READ-ONLY register file port
-  assign addrs_port = (dra & {5{dly16_slli_setrs}})
+  assign addrS_port = (dra & {5{dly16_slli_setrs}})
       | (5'b00010 & {5{op16_addi4spn | op16_lwsp | op16_swsp}})
       | (inst[11:7] & {5{op16_jr | op16_jalr | op16_slli_thunk | op16_slli}})
       | ({2'b01, inst[9:7]} & {5{op16_sw | op16_lw | op16_beqz | op16_bnez}})
@@ -229,11 +231,11 @@ module minimax #(
       | (inst[6:2] & {5{op16_mv & ~dly16_slli_setrs | op16_add}});
 
   // Select between "normal" and "microcode" register banks.
-  assign rs_banksel = (microcode ^ dly16_slli_setrs) | trap;
-  assign rd_banksel = (microcode ^ dly16_slli_setrd) | trap;
+  assign bS_banksel = (microcode ^ dly16_slli_setrs) | trap;
+  assign bD_banksel = (microcode ^ dly16_slli_setrd) | trap;
 
-  assign addrD = {rd_banksel, addrd_port};
-  assign addrS = {rs_banksel, addrs_port};
+  assign addrD = {bD_banksel, addrD_port};
+  assign addrS = {bS_banksel, addrS_port};
 
   assign aluA = (regD & {32{op16_add | op16_addi | op16_sub
                     | op16_and | op16_andi
@@ -347,7 +349,6 @@ module minimax #(
     dra = 5'b00000;
   end
 
-  reg [31:0] register_file[63:0] ; // memory
   initial begin
     register_file[63] = 32'b00000000000000000000000000000000;
     register_file[62] = 32'b00000000000000000000000000000000;
