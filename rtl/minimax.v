@@ -4,7 +4,7 @@ module minimax (
    input  [15:0] inst,
    input  [31:0] rdata,
    output [11:0] inst_addr,
-   output inst_regce,
+   output reg inst_regce,
    output [31:0] addr,
    output [31:0] wdata,
    output [3:0] wmask,
@@ -75,12 +75,10 @@ module minimax (
   wire [15:0] inst_type_masked_op;
   wire [15:0] inst_type_masked_j;
   wire [15:0] inst_type_masked_mj;
-  wire n287_o;
   wire n288_o;
   wire [3:0] n290_o;
   wire [3:0] n291_o;
   wire [11:0] n293_o;
-  wire n294_o;
   wire n295_o;
   wire n296_o;
   wire n297_o;
@@ -92,20 +90,6 @@ module minimax (
   wire n303_o;
   wire n304_o;
   wire n305_o;
-  wire n308_o;
-  wire [10:0] n309_o;
-  wire [10:0] n310_o;
-  wire n311_o;
-  wire n312_o;
-  wire n313_o;
-  wire n314_o;
-  wire n317_o;
-  wire [10:0] n318_o;
-  wire [10:0] n319_o;
-  wire n320_o;
-  wire n321_o;
-  wire n322_o;
-  wire n323_o;
   wire n324_o;
   wire n325_o;
   wire n327_o;
@@ -512,22 +496,13 @@ module minimax (
   wire n781_o;
   wire [5:0] addrS_wire;
   wire [5:0] n793_o;
-  reg [10:0] n794_q;
-  reg [10:0] n795_q;
-  reg [10:0] n796_q;
-  reg n797_q;
-  reg n798_q;
-  reg n799_q;
   reg [4:0] n800_q;
-  reg n805_q;
   wire [31:0] n807_data; // mem_rd
   wire [31:0] n808_data; // mem_rd
   assign inst_addr = n293_o;
-  assign inst_regce = n805_q;
   assign addr = alus;
   assign wdata = regd;
   assign wmask = n291_o;
-  assign rreq = n287_o;
   /* .\minimax.vhd:57:16  */
   assign addrs = addrS_wire; // (signal)
   /* .\minimax.vhd:57:23  */
@@ -544,21 +519,6 @@ module minimax (
   assign alus = n646_o; // (signal)
   /* .\minimax.vhd:58:46  */
   assign alux = n690_o; // (signal)
-  /* .\minimax.vhd:61:16  */
-  always @*
-    pc_fetch = n794_q; // (isignal)
-  initial
-    pc_fetch = 11'b00000000000;
-  /* .\minimax.vhd:61:26  */
-  always @*
-    pc_fetch_dly = n795_q; // (isignal)
-  initial
-    pc_fetch_dly = 11'b00000000000;
-  /* .\minimax.vhd:61:40  */
-  always @*
-    pc_execute = n796_q; // (isignal)
-  initial
-    pc_execute = 11'b00000000000;
   /* .\minimax.vhd:64:16  */
   always @*
     agux = n757_o; // (isignal)
@@ -574,31 +534,11 @@ module minimax (
     agub = n751_o; // (isignal)
   initial
     agub = 11'b00000000000;
-  /* .\minimax.vhd:67:16  */
-  always @*
-    bubble = n294_o; // (isignal)
-  initial
-    bubble = 1'b1;
-  /* .\minimax.vhd:67:24  */
-  always @*
-    bubble1 = n797_q; // (isignal)
-  initial
-    bubble1 = 1'b1;
-  /* .\minimax.vhd:67:33  */
-  always @*
-    bubble2 = n798_q; // (isignal)
-  initial
-    bubble2 = 1'b1;
   /* .\minimax.vhd:68:16  */
   always @*
     branch_taken = n305_o; // (isignal)
   initial
     branch_taken = 1'b0;
-  /* .\minimax.vhd:68:30  */
-  always @*
-    microcode = n799_q; // (isignal)
-  initial
-    microcode = 1'b0;
   /* .\minimax.vhd:72:16  */
   always @*
     wb = n776_o; // (isignal)
@@ -609,7 +549,7 @@ module minimax (
     dra = n800_q; // (isignal)
   initial
     dra = 5'b00000;
-  /* .\minimax.vhd:77:16  */
+
   always @* begin
     op16_addi4spn   = (inst_type_masked     == 16'b0000000000000000) & ~bubble;
     op16_lw         = (inst_type_masked     == 16'b0100000000000000) & ~bubble;
@@ -659,7 +599,9 @@ module minimax (
         op16_slli | op16_lwsp | op16_jr | op16_mv | op16_ebreak | op16_jalr | op16_add | op16_swsp |
         op16_slli_setrd | op16_slli_setrs | op16_slli_thunk);
 
-    trap = op16_trap | op32_trap; // (isignal)
+    trap = op16_trap | op32_trap;
+
+    bubble = bubble1 | bubble2;
 
   end initial begin
     op16_addi4spn = 1'b0;
@@ -703,6 +645,8 @@ module minimax (
     op16_trap = 1'b0;
 
     trap = 1'b0;
+
+    bubble = 1'b1;
   end
   assign inst_type_masked = inst & 16'b1110000000000011;
   assign inst_type_masked_i16 = inst & 16'b1110111110000011;
@@ -713,7 +657,7 @@ module minimax (
   assign inst_type_masked_mj = inst & 16'b1111000000000011;
 
   /* .\minimax.vhd:175:27  */
-  assign n287_o = op16_lwsp | op16_lw;
+  assign rreq = op16_lwsp | op16_lw;
   /* .\minimax.vhd:176:38  */
   assign n288_o = op16_swsp | op16_sw;
   /* .\minimax.vhd:176:23  */
@@ -722,8 +666,6 @@ module minimax (
   assign n291_o = 4'b1111 & n290_o;
   /* .\minimax.vhd:179:48  */
   assign n293_o = {pc_fetch, 1'b0};
-  /* .\minimax.vhd:182:27  */
-  assign n294_o = bubble1 | bubble2;
   /* .\minimax.vhd:184:41  */
   assign n295_o = |(regs);
   /* .\minimax.vhd:184:41  */
@@ -746,34 +688,6 @@ module minimax (
   assign n304_o = n303_o | op16_jalr;
   /* .\minimax.vhd:187:17  */
   assign n305_o = n304_o | op16_slli_thunk;
-  /* .\minimax.vhd:193:46  */
-  assign n308_o = ~reset;
-  /* .\minimax.vhd:193:42  */
-  assign n309_o = {{10{n308_o}}, n308_o}; // sext
-  /* .\minimax.vhd:193:42  */
-  assign n310_o = agux & n309_o;
-  /* .\minimax.vhd:196:42  */
-  assign n311_o = reset | branch_taken;
-  /* .\minimax.vhd:196:58  */
-  assign n312_o = n311_o | trap;
-  /* .\minimax.vhd:199:42  */
-  assign n313_o = reset | bubble2;
-  /* .\minimax.vhd:199:53  */
-  assign n314_o = n313_o | n287_o;
-  /* .\minimax.vhd:201:25  */
-  assign n317_o = n287_o ? 1'b0 : 1'b1;
-  /* .\minimax.vhd:201:25  */
-  assign n318_o = n287_o ? pc_fetch_dly : pc_fetch;
-  /* .\minimax.vhd:201:25  */
-  assign n319_o = n287_o ? pc_execute : pc_fetch_dly;
-  /* .\minimax.vhd:209:49  */
-  assign n320_o = microcode | trap;
-  /* .\minimax.vhd:209:73  */
-  assign n321_o = reset | op16_slli_thunk;
-  /* .\minimax.vhd:209:62  */
-  assign n322_o = ~n321_o;
-  /* .\minimax.vhd:209:58  */
-  assign n323_o = n320_o & n322_o;
   /* .\minimax.vhd:211:47  */
   assign n324_o = microcode & trap;
   /* .\minimax.vhd:211:32  */
@@ -1511,7 +1425,7 @@ module minimax (
   /* .\minimax.vhd:306:23  */
   assign n752_o = agua + agub;
   /* .\minimax.vhd:306:51  */
-  assign n753_o = branch_taken | n287_o;
+  assign n753_o = branch_taken | rreq;
   /* .\minimax.vhd:306:59  */
   assign n754_o = n753_o | trap;
   /* .\minimax.vhd:306:33  */
@@ -1567,41 +1481,47 @@ module minimax (
   /* .\minimax.vhd:319:17  */
   assign addrS_wire = {addrS_5, addrS_4_0};
   assign n793_o = {n455_o, n413_o};
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n794_q <= n310_o;
-  initial
-    n794_q = 11'b00000000000;
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n795_q <= n318_o;
-  initial
-    n795_q = 11'b00000000000;
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n796_q <= n319_o;
-  initial
-    n796_q = 11'b00000000000;
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n797_q <= n314_o;
-  initial
-    n797_q = 1'b1;
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n798_q <= n312_o;
-  initial
-    n798_q = 1'b1;
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n799_q <= n323_o;
-  initial
-    n799_q = 1'b0;
   /* .\minimax.vhd:219:17  */
   always @(posedge clk)
     n800_q <= n360_o;
   initial
     n800_q = 5'b00000;
+
+  // Fetch Process
+  always @(posedge clk) begin
+    // Update fetch instruction unless we're hung up on a multi-cycle instruction word
+    pc_fetch <= agux & {{10{~reset}}, ~reset};
+
+    // Fetch misses create a 2-cycle penalty
+    bubble2 <= reset | branch_taken | trap;
+
+    // Multi-cycle instructions must correctly pause the fetch/execution pipeline
+    bubble1 <= reset | bubble2 | rreq;
+
+    if (rreq) begin
+      pc_fetch_dly <= pc_fetch_dly;
+      pc_execute <= pc_execute;
+      inst_regce <= 1'b0;
+    end else begin
+      pc_fetch_dly <= pc_fetch;
+      pc_execute <= pc_fetch_dly;
+      inst_regce <= 1'b1;
+    end
+
+    microcode <= (microcode | trap) & ~(reset | op16_slli_thunk);
+
+  end initial begin
+    pc_fetch = 11'b00000000000;
+
+    bubble2 = 1'b1;
+    bubble1 = 1'b1;
+
+    pc_fetch_dly = 11'b00000000000;
+    pc_execute = 11'b00000000000;
+    inst_regce = 1'b0;
+
+    microcode = 1'b0;
+  end
 
   always @(posedge clk) begin
     dly16_lw <= op16_lw;
@@ -1615,11 +1535,6 @@ module minimax (
     dly16_slli_setrs = 1'b0;
   end
 
-  /* .\minimax.vhd:191:17  */
-  always @(posedge clk)
-    n805_q <= n317_o;
-  initial
-    n805_q = 1'b0;
   /* .\minimax.vhd:261:31  */
   reg [31:0] register_file[63:0] ; // memory
   initial begin
