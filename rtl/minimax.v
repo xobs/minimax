@@ -315,6 +315,114 @@ module minimax (
     end
   end
 
+  always @(posedge clk) begin
+    if (TRACE) begin
+			$write(" PF:%0h", {pc_fetch, 1'b0});
+			$write(" PFD:%0h", {pc_fetch_dly, 1'b0});
+			$write(" PE:%0h", {pc_execute, 1'b0});
+			$write(" AGUA:%0h", {aguA, 1'b0});
+			$write(" AGUB:%0h", {aguB, 1'b0});
+			$write(" AGUX:%0h", {aguX, 1'b0});
+			$write(" INST:%0h", inst);
+
+			if(op16_addi4spn) begin
+				$write(" ADI4SPN"); // shortened to fit in a tab stop
+			end else if(op16_lw) begin
+				$write(" LW");
+			end else if(op16_sw) begin
+				$write(" SW");
+			end else if(op16_addi) begin
+				$write(" ADDI");
+			end else if(op16_jal) begin
+				$write(" JAL");
+			end else if(op16_li) begin
+				$write(" LI");
+			end else if(op16_addi16sp) begin
+				$write(" ADI16SP"); // shortened to fit in a tab stop
+			end else if(op16_lui) begin
+				$write(" LUI");
+			end else if(op16_srli) begin
+				$write(" SRLI");
+			end else if(op16_srai) begin
+				$write(" SRAI");
+			end else if(op16_andi) begin
+				$write(" ANDI");
+			end else if(op16_sub) begin
+				$write(" SUB");
+			end else if(op16_xor) begin
+				$write(" XOR");
+			end else if(op16_or) begin
+				$write(" OR");
+			end else if(op16_and) begin
+				$write(" AND");
+			end else if(op16_j) begin
+				$write(" J");
+			end else if(op16_beqz) begin
+				$write(" BEQZ");
+			end else if(op16_bnez) begin
+				$write(" BNEZ");
+			end else if(op16_slli) begin
+				$write(" SLLI");
+			end else if(op16_lwsp) begin
+				$write(" LWSP");
+			end else if(op16_jr) begin
+				$write(" JR");
+			end else if(op16_mv) begin
+				$write(" MV");
+			end else if(op16_ebreak) begin
+				$write(" EBREAK");
+			end else if(op16_jalr) begin
+				$write(" JALR");
+			end else if(op16_add) begin
+				$write(" ADD");
+			end else if(op16_swsp) begin
+				$write(" SWSP");
+			end else if(op16_slli_thunk) begin
+				$write(" THUNK");
+			end else if(op16_slli_setrd) begin
+				$write(" SETRD");
+			end else if(op16_slli_setrs) begin
+				$write(" SETRS");
+			end else if(op32) begin
+				$write(" RV32I");
+      end else begin
+				$write(" NOP?");
+			end
+
+      if(trap) begin
+				$write(" [TRAP]");
+			end
+			if(branch_taken) begin
+				$write(" [TAKEN]");
+			end
+			if(bubble) begin
+				$write(" [BUBBLE]");
+			end
+			if(wb) begin
+				$write(" [WB]");
+			end
+			if(reset) begin
+				$write(" [RESET]");
+			end
+			if(microcode) begin
+				$write(" [MCODE]");
+			end
+			if(| wmask) begin
+				$write(" WMASK:%0h", wmask);
+				$write(" ADDR:%0h", addr);
+				$write(" WDATA:%0h", wdata);
+			end
+			if(rreq) begin
+				$write(" [RREQ]");
+				$write(" ADDR:%0h", addr);
+			end
+			if(| dra) begin
+				$write(" @DRA=%0h", dra);
+			end
+			$display("");
+    end
+  end
+
   initial begin
     register_file[63] = 32'b00000000000000000000000000000000;
     register_file[62] = 32'b00000000000000000000000000000000;
