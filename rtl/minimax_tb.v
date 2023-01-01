@@ -27,42 +27,6 @@ parameter UC_BASE = 32'h0000800;
 	reg reset;
 
 	reg [31:0] ticks;
-
-	// reg [2047:0] type rom_type is array(0 to 2047) of std_logic_vector(31 downto 0);
-
-	// impure function rom_init return rom_type is
-	// 	file f : text open read_mode is ROM_FILENAME;
-	// 	variable l : line;
-	// 	variable v16 : std_logic_vector(15 downto 0);
-	// 	variable rom : rom_type;
-	// 	variable good : boolean := true;
-	// 	variable i : integer := 0;
-	// begin
-	// 	while not endfile(f) loop
-	// 		readline(f, l);
-	// 		hread(l, v16, good);
-	// 		assert good severity failure;
-	// 		rom(i)(15 downto 0) := v16;
-
-	// 		-- Could be an odd number of lines in the file
-	// 		if endfile(f) then
-	// 			exit;
-	// 		end if;
-	// 		readline(f, l);
-	// 		hread(l, v16, good);
-	// 		assert good severity failure;
-	// 		rom(i)(31 downto 16) := v16;
-
-	// 		i := i + 1;
-	// 	end loop;
-
-	// 	assert i > 0
-	// 		report "Failed to read any ROM data!"
-	// 		severity failure;
-
-	// 	return rom;
-	// end function;
-
 	reg [15:0] rom_array [0:8191];
 
 	// Run clock at 10 ns
@@ -94,18 +58,22 @@ parameter UC_BASE = 32'h0000800;
 
 	wire [PC_BITS-1:0] inst_addr;
 	wire [31:0] addr, wdata;
-	wire [31:0] rdata;
+	reg [31:0] rdata;
 	wire [3:0] wmask;
 	wire rreq;
-
-	assign rdata = {rom_array[addr[PC_BITS-1:1]], rom_array[addr[PC_BITS-1:1]+1]};
-	assign inst_lat = rom_array[inst_addr[PC_BITS-1:1]];
-	assign rom_window = rom_array[ticks];
+	reg [31:0] i32;
 
 	reg cpu_reset;
 
+	assign rom_window = rom_array[ticks];
+
+	assign inst_lat = inst_addr[1] ? i32[31:16] : i32[15:0];
 	always @(posedge clk) begin
 		cpu_reset <= reset;
+
+		rdata <= {rom_array[{addr[PC_BITS-1:2], 1'b0}], rom_array[{addr[PC_BITS-1:2], 1'b1}]};
+		i32 <= {rom_array[{inst_addr[PC_BITS-1:2], 1'b0}], rom_array[{inst_addr[PC_BITS-1:2], 1'b1}]};
+
 		if (inst_regce) begin
 			inst_reg <= inst_lat;
 		end
@@ -118,6 +86,7 @@ parameter UC_BASE = 32'h0000800;
 	end
 
 	minimax #(
+		.TRACE(1'b0),
 		.PC_BITS(PC_BITS),
 		.UC_BASE(UC_BASE)
 	) dut (
