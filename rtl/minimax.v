@@ -105,8 +105,8 @@ module minimax (
   assign inst_type_masked_j   = inst & 16'b111_1_00000_11111_11;
   assign inst_type_masked_mj  = inst & 16'b111_1_00000_00000_11;
 
-  assign op16_lw         = (inst_type_masked     == 16'b010_0_00000_00000_00) & ~bubble;
   assign op16_addi4spn   = (inst_type_masked     == 16'b000_0_00000_00000_00) & ~bubble;
+  assign op16_lw         = (inst_type_masked     == 16'b010_0_00000_00000_00) & ~bubble;
   assign op16_sw         = (inst_type_masked     == 16'b110_0_00000_00000_00) & ~bubble;
   
   assign op16_addi       = (inst_type_masked     == 16'b000_0_00000_00000_01) & ~bubble;
@@ -216,9 +216,9 @@ module minimax (
 
     // Load and setrs/setrd instructions complete a cycle after they are
     // initiated, so we need to keep some state.
-    dra <= (regD[4:0] & ({5{op16_slli_setrd | op16_slli_setrs}})) |
-           ({2'b01, inst[4:2]} & {5{op16_lw}}) |
-           (inst[11:7] & {5{op16_lwsp | op32}});
+    dra <= (regD[4:0] & ({5{op16_slli_setrd | op16_slli_setrs}}))
+           | ({2'b01, inst[4:2]} & {5{op16_lw}})
+           | (inst[11:7] & {5{op16_lwsp | op32}});
   end
 
   // READ/WRITE register file port
@@ -297,7 +297,6 @@ module minimax (
         | (uc_base[PC_BITS-1:1] & {(PC_BITS){trap}});
 
   assign aguX = (aguA + aguB) + {{(PC_BITS-1){1'b0}}, ~(branch_taken | rreq | trap)};
-  // assign aguX = (aguA + aguB) + {{(PC_BITS-1){1'b0}}, ~(branch_taken | rreq | trap | bubble2)};
 
   assign wb = trap |                  // writes microcode x1/ra
              dly16_lw | dly16_lwsp |  // writes data
