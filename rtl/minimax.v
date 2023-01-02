@@ -14,9 +14,10 @@ module minimax (
   // Parameters are currently unimplemented
   parameter PC_BITS = 12;
   parameter [31:0] UC_BASE = 32'h00000000;
+  parameter TRACE = 0;
+
   wire [31:0] uc_base;
   assign uc_base = UC_BASE;
-  parameter TRACE = 0;
 
   // Register file
   (* ram_style = "distributed" *) reg [31:0] register_file[63:0];
@@ -105,6 +106,7 @@ module minimax (
   assign inst_type_masked_j   = inst & 16'b111_1_00000_11111_11;
   assign inst_type_masked_mj  = inst & 16'b111_1_00000_00000_11;
 
+  // From 16.8 (RVC Instruction Set Listings)
   assign op16_addi4spn   = (inst_type_masked     == 16'b000_0_00000_00000_00) & ~bubble;
   assign op16_lw         = (inst_type_masked     == 16'b010_0_00000_00000_00) & ~bubble;
   assign op16_sw         = (inst_type_masked     == 16'b110_0_00000_00000_00) & ~bubble;
@@ -176,7 +178,7 @@ module minimax (
   // Fetch Process
   always @(posedge clk) begin
     // Update fetch instruction unless we're hung up on a multi-cycle instruction word
-    pc_fetch <= aguX & {(PC_BITS-1){~reset}};
+    pc_fetch <= aguX & {(PC_BITS){~reset}};
 
     // Fetch misses create a 2-cycle penalty
     bubble2 <= reset | branch_taken | trap;
@@ -260,15 +262,15 @@ module minimax (
                     | op16_or | op16_xor
                     | op16_addi16sp
                     | op16_slli | op16_srli | op16_srai}})
-          | ({22'b0, inst[10:7], inst[12:11], inst[5], inst[6], 2'b00} & {32{op16_addi4spn}})
-          | ({24'b0, inst[8:7], inst[12:9], 2'b00} & {32{op16_swsp}})
-          | ({24'b0, inst[3:2], inst[12], inst[6:4], 2'b00} & {32{op16_lwsp}})
-          | ({25'b0, inst[5], inst[12:10], inst[6], 2'b00} & {32{op16_lw | op16_sw}});
+          | ({22'b0, inst[10:7], inst[12:11], inst[5], inst[6], 2'b0} & {32{op16_addi4spn}})
+          | ({24'b0, inst[8:7], inst[12:9], 2'b0} & {32{op16_swsp}})
+          | ({24'b0, inst[3:2], inst[12], inst[6:4], 2'b0} & {32{op16_lwsp}})
+          | ({25'b0, inst[5], inst[12:10], inst[6], 2'b0} & {32{op16_lw | op16_sw}});
 
   assign aluB = regS
           | ({{27{inst[12]}}, inst[6:2]} & {32{op16_addi | op16_andi | op16_li}})
-          | ({{15{inst[12]}}, inst[6:2], 12'b000000000000} & {32{op16_lui}})
-          | ({{23{inst[12]}}, inst[4:3], inst[5], inst[2], inst[6], 4'b0000} & {32{op16_addi16sp}});
+          | ({{15{inst[12]}}, inst[6:2], 12'b0} & {32{op16_lui}})
+          | ({{23{inst[12]}}, inst[4:3], inst[5], inst[2], inst[6], 4'b0} & {32{op16_addi16sp}});
 
   // This synthesizes into 4 CARRY8s - no need for manual xor/cin heroics
   assign aluS = op16_sub ? (aluA - aluB) : (aluA + aluB);
@@ -315,6 +317,7 @@ module minimax (
     end
   end
 
+  // Tracing
   always @(posedge clk) begin
     if (TRACE) begin
 			$write(" PF:%0h", {pc_fetch, 1'b0});
