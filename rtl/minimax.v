@@ -288,17 +288,17 @@ module minimax (
           ({{(32-1-PC_BITS-1){1'b0}}, pc_fetch_dly[PC_BITS-1:1], 1'b0} & {32{op16_jal | op16_jalr | trap}}); //  instruction following the jump (hence _dly)
 
   // Address Generation Unit (AGU)
-  assign aguA = (pc_fetch & {PC_BITS{~(trap | branch_taken)}})
-        | ((pc_execute & {PC_BITS{branch_taken}}) & {PC_BITS{~(op16_jr | op16_jalr | op16_slli_thunk)}});
+  assign aguA = (pc_fetch & ~{(PC_BITS-1){trap | branch_taken}})
+        | (pc_execute & {(PC_BITS-1){branch_taken}} & ~{(PC_BITS-1){op16_jr | op16_jalr | op16_slli_thunk}});
 
-  assign aguB = (regS[PC_BITS-1:1] & {PC_BITS{op16_jr | op16_jalr | op16_slli_thunk}})
-        | ({{(PC_BITS-10){inst[12]}}, inst[8], inst[10:9], inst[6], inst[7], inst[2], inst[11], inst[5:3]}
-              & {(PC_BITS){branch_taken}} & {PC_BITS{op16_j | op16_jal}})
-        | ({{(PC_BITS-7){inst[12]}}, inst[6:5], inst[2], inst[11:10], inst[4:3]}
-              & {(PC_BITS){branch_taken}} & {PC_BITS{op16_bnez | op16_beqz}})
-        | (uc_base[PC_BITS-1:1] & {(PC_BITS){trap}});
+  assign aguB = (regS[PC_BITS-1:1] & {(PC_BITS-1){op16_jr | op16_jalr | op16_slli_thunk}})
+        | ({{(PC_BITS-11){inst[12]}}, inst[8], inst[10:9], inst[6], inst[7], inst[2], inst[11], inst[5:3]}
+              & {(PC_BITS-1){branch_taken & (op16_j | op16_jal)}})
+        | ({{(PC_BITS-8){inst[12]}}, inst[6:5], inst[2], inst[11:10], inst[4:3]}
+              & {(PC_BITS-1){branch_taken & (op16_bnez | op16_beqz)}})
+        | (uc_base[PC_BITS-1:1] & {(PC_BITS-1){trap}});
 
-  assign aguX = (aguA + aguB) + {{(PC_BITS-1){1'b0}}, ~(branch_taken | rreq | trap)};
+  assign aguX = (aguA + aguB) + {{(PC_BITS-2){1'b0}}, ~(branch_taken | rreq | trap)};
 
   assign wb = trap |                  // writes microcode x1/ra
              dly16_lw | dly16_lwsp |  // writes data
