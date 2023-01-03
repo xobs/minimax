@@ -318,111 +318,216 @@ module minimax (
   end
 
   // Tracing
+  initial begin
+    if (TRACE) begin
+`ifdef COMPATIBLE_TRACE
+      $display("FETCH1\t",
+        "FETCH2\t",
+        "EXECUTE\t",
+        "aguA\t",
+        "aguB\t",
+        "aguX\t",
+        "INST\t",
+        "OPCODE\t",
+        "addrD\t",
+        "addrS\t",
+        "regD\t\t",
+        "regS\t\t",
+        "aluA\t\t",
+        "aluB\t\t",
+        "aluS\t\t",
+        "aluX");
+`else
+      $display(
+          "  FETCH1"
+        , "   FETCH2"
+        , "  EXECUTE"
+        , "     aguA"
+        , "     aguB"
+        , "     aguX"
+        , "     INST"
+        , " OPCODE  "
+        , " addrD"
+        , " addrS"
+        , "     regD"
+        , "     regS"
+        , "     aluA"
+        , "     aluB"
+        , "     aluS"
+        , "     aluX"
+        , " FLAGS");
+`endif
+    end
+  end
   always @(posedge clk) begin
     if (TRACE) begin
-			$write(" PF:%0h", {pc_fetch, 1'b0});
-			$write(" PFD:%0h", {pc_fetch_dly, 1'b0});
-			$write(" PE:%0h", {pc_execute, 1'b0});
-			$write(" AGUA:%0h", {aguA, 1'b0});
-			$write(" AGUB:%0h", {aguB, 1'b0});
-			$write(" AGUX:%0h", {aguX, 1'b0});
-			$write(" INST:%0h", inst);
+`ifdef COMPATIBLE_TRACE
+      $write("%H\t", {pc_fetch, 1'b0});
+      $write("%H\t", {pc_fetch_dly, 1'b0});
+      $write("%H\t", {pc_execute, 1'b0});
+      $write("%H\t", {aguA, 1'b0});
+      $write("%H\t", {aguB, 1'b0});
+      $write("%H\t", {aguX, 1'b0});
+      $write("%H\t", inst);
 
-			if(op16_addi4spn) begin
-				$write(" ADI4SPN"); // shortened to fit in a tab stop
-			end else if(op16_lw) begin
-				$write(" LW");
-			end else if(op16_sw) begin
-				$write(" SW");
-			end else if(op16_addi) begin
-				$write(" ADDI");
-			end else if(op16_jal) begin
-				$write(" JAL");
-			end else if(op16_li) begin
-				$write(" LI");
-			end else if(op16_addi16sp) begin
-				$write(" ADI16SP"); // shortened to fit in a tab stop
-			end else if(op16_lui) begin
-				$write(" LUI");
-			end else if(op16_srli) begin
-				$write(" SRLI");
-			end else if(op16_srai) begin
-				$write(" SRAI");
-			end else if(op16_andi) begin
-				$write(" ANDI");
-			end else if(op16_sub) begin
-				$write(" SUB");
-			end else if(op16_xor) begin
-				$write(" XOR");
-			end else if(op16_or) begin
-				$write(" OR");
-			end else if(op16_and) begin
-				$write(" AND");
-			end else if(op16_j) begin
-				$write(" J");
-			end else if(op16_beqz) begin
-				$write(" BEQZ");
-			end else if(op16_bnez) begin
-				$write(" BNEZ");
-			end else if(op16_slli) begin
-				$write(" SLLI");
-			end else if(op16_lwsp) begin
-				$write(" LWSP");
-			end else if(op16_jr) begin
-				$write(" JR");
-			end else if(op16_mv) begin
-				$write(" MV");
-			end else if(op16_ebreak) begin
-				$write(" EBREAK");
-			end else if(op16_jalr) begin
-				$write(" JALR");
-			end else if(op16_add) begin
-				$write(" ADD");
-			end else if(op16_swsp) begin
-				$write(" SWSP");
-			end else if(op16_slli_thunk) begin
-				$write(" THUNK");
-			end else if(op16_slli_setrd) begin
-				$write(" SETRD");
-			end else if(op16_slli_setrs) begin
-				$write(" SETRS");
-			end else if(op32) begin
-				$write(" RV32I");
-      end else begin
-				$write(" NOP?");
-			end
+      if(op16_addi4spn)        $write("ADI4SPN");
+      else if(op16_lw)         $write("LW");
+      else if(op16_sw)         $write("SW");
+      else if(op16_addi)       $write("ADDI");
+      else if(op16_jal)        $write("JAL");
+      else if(op16_li)         $write("LI");
+      else if(op16_addi16sp)   $write("ADI16SP");
+      else if(op16_lui)        $write("LUI");
+      else if(op16_srli)       $write("SRLI");
+      else if(op16_srai)       $write("SRAI");
+      else if(op16_andi)       $write("ANDI");
+      else if(op16_sub)        $write("SUB");
+      else if(op16_xor)        $write("XOR");
+      else if(op16_or)         $write("OR");
+      else if(op16_and)        $write("AND");
+      else if(op16_j)          $write("J");
+      else if(op16_beqz)       $write("BEQZ");
+      else if(op16_bnez)       $write("BNEZ");
+      else if(op16_slli)       $write("SLLI");
+      else if(op16_lwsp)       $write("LWSP");
+      else if(op16_jr)         $write("JR");
+      else if(op16_mv)         $write("MV");
+      else if(op16_ebreak)     $write("EBREAK");
+      else if(op16_jalr)       $write("JALR");
+      else if(op16_add)        $write("ADD");
+      else if(op16_swsp)       $write("SWSP");
+      else if(op16_slli_thunk) $write("THUNK");
+      else if(op16_slli_setrd) $write("SETRD");
+      else if(op16_slli_setrs) $write("SETRS");
+      else if(op32)            $write("RV32I");
+      else                     $write("NOP?");
+
+      $write("\t%H", addrD);
+      $write("\t%H", addrS);
+
+      $write("\t%H", regD);
+      $write("\t%H", regS);
+
+      $write("\t%H", aluA);
+      $write("\t%H", aluB);
+      $write("\t%H", aluS);
+      $write("\t%H", aluX);
 
       if(trap) begin
-				$write(" [TRAP]");
-			end
-			if(branch_taken) begin
-				$write(" [TAKEN]");
-			end
-			if(bubble) begin
-				$write(" [BUBBLE]");
-			end
-			if(wb) begin
-				$write(" [WB]");
-			end
-			if(reset) begin
-				$write(" [RESET]");
-			end
-			if(microcode) begin
-				$write(" [MCODE]");
-			end
-			if(| wmask) begin
-				$write(" WMASK:%0h", wmask);
-				$write(" ADDR:%0h", addr);
-				$write(" WDATA:%0h", wdata);
-			end
-			if(rreq) begin
-				$write(" [RREQ]");
-				$write(" ADDR:%0h", addr);
-			end
-			if(| dra) begin
-				$write(" @DRA=%0h", dra);
-			end
-			$display("");
+        $write("\tTRAP");
+      end
+      if(branch_taken) begin
+        $write("\tTAKEN");
+      end
+      if(bubble) begin
+        $write("\tBUBBLE");
+      end
+      if(wb) begin
+        $write("\tWB");
+      end
+      if(reset) begin
+        $write("\tRESET");
+      end
+      if(microcode) begin
+        $write("\tMCODE");
+      end
+      if(| wmask) begin
+        $write("\tWMASK=%H", wmask);
+        $write("\tADDR=%H", addr);
+        $write("\tWDATA=%H", wdata);
+      end
+      if(rreq) begin
+        $write("\tRREQ");
+        $write("\tADDR=%H", addr);
+      end
+      if(| dra) begin
+        $write("\t@DRA=%H", dra);
+      end
+      $display("");
+`else
+      $write("%8H ", {pc_fetch, 1'b0});
+      $write("%8H ", {pc_fetch_dly, 1'b0});
+      $write("%8H ", {pc_execute, 1'b0});
+      $write("%8H ", {aguA, 1'b0});
+      $write("%8H ", {aguB, 1'b0});
+      $write("%8H ", {aguX, 1'b0});
+      $write("%8H ", inst);
+
+      if(op16_addi4spn)        $write("ADDI4SPN");
+      else if(op16_lw)         $write("LW      ");
+      else if(op16_sw)         $write("SW      ");
+      else if(op16_addi)       $write("ADDI    ");
+      else if(op16_jal)        $write("JAL     ");
+      else if(op16_li)         $write("LI      ");
+      else if(op16_addi16sp)   $write("ADDI16SP");
+      else if(op16_lui)        $write("LUI     ");
+      else if(op16_srli)       $write("SRLI    ");
+      else if(op16_srai)       $write("SRAI    ");
+      else if(op16_andi)       $write("ANDI    ");
+      else if(op16_sub)        $write("SUB     ");
+      else if(op16_xor)        $write("XOR     ");
+      else if(op16_or)         $write("OR      ");
+      else if(op16_and)        $write("AND     ");
+      else if(op16_j)          $write("J       ");
+      else if(op16_beqz)       $write("BEQZ    ");
+      else if(op16_bnez)       $write("BNEZ    ");
+      else if(op16_slli)       $write("SLLI    ");
+      else if(op16_lwsp)       $write("LWSP    ");
+      else if(op16_jr)         $write("JR      ");
+      else if(op16_mv)         $write("MV      ");
+      else if(op16_ebreak)     $write("EBREAK  ");
+      else if(op16_jalr)       $write("JALR    ");
+      else if(op16_add)        $write("ADD     ");
+      else if(op16_swsp)       $write("SWSP    ");
+      else if(op16_slli_thunk) $write("THUNK   ");
+      else if(op16_slli_setrd) $write("SETRD   ");
+      else if(op16_slli_setrs) $write("SETRS   ");
+      else if(op32)            $write("RV32I   ");
+      else                     $write("NOP?    ");
+      
+      $write("  %1b.%2H", addrD[5], addrD[4:0]);
+      $write("  %1b.%2H", addrS[5], addrS[4:0]);
+
+      $write(" %8H", regD);
+      $write(" %8H", regS);
+
+      $write(" %8H", aluA);
+      $write(" %8H", aluB);
+      $write(" %8H", aluS);
+      $write(" %8H", aluX);
+
+      if(trap) begin
+        $write(" TRAP");
+      end
+      if(branch_taken) begin
+        $write(" TAKEN");
+      end
+      if(bubble) begin
+        $write(" BUBBLE");
+      end
+      if(wb) begin
+        $write(" WB");
+      end
+      if(reset) begin
+        $write(" RESET");
+      end
+      if(microcode) begin
+        $write(" MCODE");
+      end
+      if(| wmask) begin
+        $write(" WMASK=%0h", wmask);
+        $write(" ADDR=%0h", addr);
+        $write(" WDATA=%0h", wdata);
+      end
+      if(rreq) begin
+        $write(" RREQ");
+        $write(" ADDR=%0h", addr);
+      end
+      if(| dra) begin
+        $write(" @DRA=%0h", dra);
+      end
+      $display("");
+`endif
     end
   end
 
