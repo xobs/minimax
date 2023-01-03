@@ -7,3 +7,9 @@ test/axsim.sh
 *.swp
 *.swo
 *.vcd
+
+# Python venv
+bin
+lib
+lib64
+pyvenv.cfg
