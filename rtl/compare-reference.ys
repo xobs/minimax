@@ -21,3 +21,21 @@ opt -full
 equiv_simple -seq 5
 equiv_induct -seq 5
 equiv_status -assert
+
+## method 2
+#equiv_struct -icells t:$adff t:$equiv
+#equiv_simple -seq 5
+#equiv_induct -seq 5
+#equiv_status -assert
+
+## method 3
+#techmap -map +/adff2dff.v
+#equiv_simple -seq 5
+#equiv_induct -seq 5
+#equiv_status -assert
+
+## method 4
+#clk2fflogic
+#equiv_simple -seq 10
+#equiv_induct -seq 10
+#equiv_status -assert
