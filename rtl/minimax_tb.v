@@ -12,126 +12,145 @@
 
 `timescale 1 ns / 1 ps
 
+// Use defines here rather than parameters, because iverilog's `-P` argument
+// doesn't seem to work properly.
+`ifndef ROM_FILENAME
+`define ROM_FILENAME "../asm/blink.mem"
+`endif
+
+`ifndef MICROCODE_FILENAME
+`define MICROCODE_FILENAME "../asm/microcode.mem"
+`endif
+
+`ifndef VCD_FILENAME
+`define VCD_FILENAME "minimax_tb.vcd"
+`endif
+
+`ifndef MAXTICKS
+`define MAXTICKS 100000
+`endif
+
 module minimax_tb;
-parameter MAXTICKS = 100000;
-parameter PC_BITS = 14;
-parameter UC_BASE = 32'h0000800;
+    parameter MAXTICKS = `MAXTICKS;
+    parameter PC_BITS = 13;
+    parameter UC_BASE = 32'h0000800;
+    parameter ROM_FILENAME = `ROM_FILENAME;
+    parameter MICROCODE_FILENAME = `MICROCODE_FILENAME;
+    parameter TRACE = 1'b1;
 
-// 	generic (
-// 		ROM_FILENAME : string := "/dev/null";
-// 		MAXTICKS : integer := -1;
-// 		TRACE : boolean := TRUE);
+    reg clk;
+    reg reset;
 
-// architecture behav of minimax_tb is
-	reg clk;
-	reg reset;
+    reg [31:0] ticks;
+    reg [15:0] rom_array [0:8191];
 
-	reg [31:0] ticks;
-	reg [15:0] rom_array [0:8191];
+    // Run clock at 10 ns
+    always #10 clk <= (clk === 1'b0);
 
-	// Run clock at 10 ns
-	always #10 clk <= (clk === 1'b0);
+    initial begin
+        clk = 0;
+    end
 
-	initial begin
-		clk = 0;
-	end
+    integer i;
+    initial begin
+        $dumpfile(`VCD_FILENAME);
+        $dumpvars(0, minimax_tb);
 
-	initial begin
-		$dumpfile("minimax_tb.vcd");
-    	$dumpvars(0, minimax_tb);
+        for (i = 0; i < 8192; i = i + 1) rom_array[i] = 16'b0;
 
-		$readmemh("../asm/blink.mem", rom_array);
-		$readmemh("../asm/microcode.mem", rom_array, UC_BASE);
+        $readmemh(ROM_FILENAME, rom_array);
+        `ifndef SKIP_MICROCODE
+        $readmemh(MICROCODE_FILENAME, rom_array, UC_BASE);
+        `endif
 
-		$display("Running clock...");
-		repeat (MAXTICKS) begin
-			@(posedge clk);
-		end
-		$display("Finished test");
-		$finish;
-	end
+        forever begin
+            @(posedge clk);
+        end
+    end
 
-	wire [31:0] rom_window;
-	wire [15:0] inst_lat;
-	reg [15:0] inst_reg;
-	wire inst_regce;
+    wire [31:0] rom_window;
+    reg [15:0] inst_lat;
+    reg [15:0] inst_reg;
+    wire inst_regce;
 
-	wire [PC_BITS-1:0] inst_addr;
-	wire [31:0] addr, wdata;
-	reg [31:0] rdata;
-	wire [3:0] wmask;
-	wire rreq;
-	reg [31:0] i32;
+    wire [PC_BITS-1:0] inst_addr;
+    wire [31:0] addr, wdata;
+    reg [31:0] rdata;
+    wire [3:0] wmask;
+    wire rreq;
+    // reg [31:0] i32;
+    wire [31:0] i32;
 
-	reg cpu_reset;
+    assign rom_window = rom_array[ticks];
+    assign i32 = {rom_array[{inst_addr[PC_BITS-1:2], 1'b1}], rom_array[{inst_addr[PC_BITS-1:2], 1'b0}]};
 
-	assign rom_window = rom_array[ticks];
+    always @(posedge clk) begin
 
-	assign inst_lat = inst_addr[1] ? i32[31:16] : i32[15:0];
-	always @(posedge clk) begin
-		cpu_reset <= reset;
+        rdata <= {rom_array[{addr[PC_BITS-1:2], 1'b1}], rom_array[{addr[PC_BITS-1:2], 1'b0}]};
 
-		rdata <= {rom_array[{addr[PC_BITS-1:2], 1'b0}], rom_array[{addr[PC_BITS-1:2], 1'b1}]};
-		i32 <= {rom_array[{inst_addr[PC_BITS-1:2], 1'b0}], rom_array[{inst_addr[PC_BITS-1:2], 1'b1}]};
+        if (inst_addr[1])
+            inst_lat <= i32[31:16];
+        else
+            inst_lat <= i32[15:0];
 
-		if (inst_regce) begin
-			inst_reg <= inst_lat;
-		end
+        if (inst_regce) begin
+            inst_reg <= inst_lat;
+        end
 
-		if (wmask == 4'hf) begin
-			rom_array[addr[PC_BITS-1:1]] <= wdata[31:16];
-			rom_array[addr[PC_BITS-1:1]+1] <= wdata[15:0];
-		end
+        if (wmask == 4'hf) begin
+            rom_array[addr[PC_BITS-1:1]+1] <= wdata[31:16];
+            rom_array[addr[PC_BITS-1:1]] <= wdata[15:0];
+        end
 
-	end
+    end
 
-	minimax #(
-		.TRACE(1'b0),
-		.PC_BITS(PC_BITS),
-		.UC_BASE(UC_BASE)
-	) dut (
-		.clk(clk),
-		.reset(cpu_reset),
-		.inst_addr(inst_addr),
-		.inst(inst_reg),
-		.inst_regce(inst_regce),
-		.addr(addr),
-		.wdata(wdata),
-		.rdata(rdata),
-		.wmask(wmask),
-		.rreq(rreq)
-	);
+    minimax #(
+        .TRACE(TRACE),
+        .PC_BITS(PC_BITS),
+        .UC_BASE(UC_BASE)
+    ) dut (
+        .clk(clk),
+        .reset(reset),
+        .inst_addr(inst_addr),
+        .inst(inst_reg),
+        .inst_regce(inst_regce),
+        .addr(addr),
+        .wdata(wdata),
+        .rdata(rdata),
+        .wmask(wmask),
+        .rreq(rreq)
+    );
 
-	initial begin
-		reset <= 1'b1;
-		#96;
-		reset <= 1'b0;
-	end
+    initial begin
+        reset <= 1'b1;
+        #96;
+        reset <= 1'b0;
+    end
 
-	initial begin
-		ticks <= 0;
-	end
+    initial begin
+        ticks <= 0;
+    end
 
-	// Capture test exit conditions - timeout or quit
-	always @(posedge clk)
-	begin
-		// Track ticks counter and bail if we took too long
-		ticks <= ticks + 1;
-		if (ticks >= MAXTICKS) begin
-			$display("FAIL: Exceeded MAXTICKS");
-			$finish;
-		end
+    // Capture test exit conditions - timeout or quit
+    always @(posedge clk)
+    begin
+        // Track ticks counter and bail if we took too long
+        ticks <= ticks + 1;
+        if (MAXTICKS != -1 && ticks >= MAXTICKS) begin
+            $display("FAIL: Exceeded MAXTICKS of %0d", MAXTICKS);
+            $finish_and_return(1);
+        end
 
-		// // Capture writes to address 0xfffffffc and use these as "quit" values
-		// if(wmask=x"f" and addr=x"fffffffc") begin
-		// 	if nor wdata then
-		// 		write(buf, string'("SUCCESS: returned 0."));
-		// 	else
-		// 		write(buf, "FAIL: returned " & integer'image(to_integer(signed(wdata))));
-		// 	end if;
-		// 	writeline(output, buf);
-		// 	finish(to_integer(signed(wdata)));
-		// end
-	end
+        // Capture writes to address 0xfffffffc and use these as "quit" values
+        if (wmask == 4'b1111 && addr == 32'hfffffffc) begin
+            if (~|wdata) begin
+                $display("SUCCESS: returned 0.");
+                $finish_and_return(0);
+            end else begin
+                $display("FAIL: returned %0d", wdata);
+                $finish_and_return(1);
+            end
+        end
+    end
 
 endmodule
