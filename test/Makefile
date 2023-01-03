@@ -17,7 +17,7 @@ LDFLAGS := -march=rv32ic -mabi=ilp32	\
 	   -fno-pic -Wl,--no-relax	\
 	   -nostartfiles -nostdlib
 
-default: dirs $(addsuffix /pass, $(TESTS))
+default: dirs $(addsuffix /pass, $(TESTS)) $(addsuffix /pass.verilog, $(TESTS))
 
 dirs:
 	-@mkdir -p $(TESTS)
