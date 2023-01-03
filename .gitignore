@@ -6,3 +6,4 @@ xsim.dir
 test/axsim.sh
 *.swp
 *.swo
+*.vcd
