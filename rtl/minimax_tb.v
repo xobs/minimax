@@ -30,13 +30,19 @@
 `define MAXTICKS 100000
 `endif
 
+`ifdef ENABLE_TRACE
+`define TRACE 1'b1
+`else
+`define TRACE 1'b0
+`endif
+
 module minimax_tb;
     parameter MAXTICKS = `MAXTICKS;
     parameter PC_BITS = 13;
     parameter UC_BASE = 32'h0000800;
     parameter ROM_FILENAME = `ROM_FILENAME;
     parameter MICROCODE_FILENAME = `MICROCODE_FILENAME;
-    parameter TRACE = 1'b1;
+    parameter TRACE = `TRACE;
 
     reg clk;
     reg reset;

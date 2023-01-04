@@ -50,6 +50,8 @@ $(TESTS): dirs $$@/pass $$@/pass.verilog
 	cd $* && \
 		$(IVERILOG) -o test-harness.vvp \
 			-DCOMPATIBLE_TRACE \
+			-DENABLE_ASSERTS \
+			-DENABLE_TRACE \
 			-DROM_FILENAME='"minimax.rom"' \
 			-DSKIP_MICROCODE \
 			../../rtl/minimax_tb.v ../../rtl/minimax.v \

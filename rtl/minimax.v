@@ -196,9 +196,10 @@ module minimax (
 
     microcode <= (microcode | trap) & ~(reset | op16_slli_thunk);
 
+`ifdef ENABLE_ASSERTS
     if (microcode & trap) begin
       $display("Double trap!");
-      $finish;
+      $stop;
     end
 
     // Check to make sure the microcode doesn't exceed the program counter size
@@ -206,6 +207,7 @@ module minimax (
       $display("Microcode at 0x%0h cannot be reached with a %d-bit program counter!", UC_BASE, PC_BITS);
       $stop;
     end
+`endif
 
   end
 
@@ -318,8 +320,8 @@ module minimax (
   end
 
   // Tracing
+`ifdef ENABLE_TRACE
   initial begin
-    if (TRACE) begin
 `ifdef COMPATIBLE_TRACE
       $display("FETCH1\t",
         "FETCH2\t",
@@ -357,10 +359,9 @@ module minimax (
         , "     aluX"
         , " FLAGS");
 `endif
-    end
   end
+
   always @(posedge clk) begin
-    if (TRACE) begin
 `ifdef COMPATIBLE_TRACE
       $write("%H\t", {pc_fetch, 1'b0});
       $write("%H\t", {pc_fetch_dly, 1'b0});
@@ -444,7 +445,7 @@ module minimax (
         $write("\t@DRA=%H", dra);
       end
       $display("");
-`else
+`else // `ifdef COMPATIBLE_TRACE
       $write("%8H ", {pc_fetch, 1'b0});
       $write("%8H ", {pc_fetch_dly, 1'b0});
       $write("%8H ", {pc_execute, 1'b0});
@@ -527,9 +528,9 @@ module minimax (
         $write(" @DRA=%0h", dra);
       end
       $display("");
-`endif
+`endif // `ifdef COMPATIBLE_TRACE
     end
-  end
+`endif // `ifdef ENABLE_TRACE
 
   initial begin
     register_file[63] = 32'b00000000000000000000000000000000;
@@ -598,6 +599,7 @@ module minimax (
     register_file[0] = 32'b00000000000000000000000000000000;
   end
 
+`ifdef ENABLE_REGISTER_INSPECTION
   // Wires that make it easier to inspect the register file during simulation
   wire [31:0] cpu_x0;
   wire [31:0] cpu_x1;
@@ -730,5 +732,6 @@ module minimax (
   assign uc_x29 = register_file[29 + 32];
   assign uc_x30 = register_file[30 + 32];
   assign uc_x31 = register_file[31 + 32];
+`endif // `ifdef ENABLE_REGISTER_INSPECTION
 
 endmodule
