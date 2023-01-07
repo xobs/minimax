@@ -20,7 +20,7 @@ module minimax (
   assign uc_base = UC_BASE;
 
   // Register file
-  (* ram_style = "distributed" *) reg [31:0] register_file[63:0];
+  reg [31:0] register_file[63:0];
 
   // Register file address ports
   wire [5:0] addrS, addrD;
@@ -29,7 +29,9 @@ module minimax (
   wire [31:0] regS, regD, aluA, aluB, aluS, aluX;
 
   // Program counter
-  reg [PC_BITS-1:1] pc_fetch = 31'b0, pc_fetch_dly = 31'b0, pc_execute = 31'b0;
+  reg [PC_BITS-1:1] pc_fetch = {(PC_BITS-2){1'b0}};
+  reg [PC_BITS-1:1] pc_fetch_dly = {(PC_BITS-2){1'b0}};
+  reg [PC_BITS-1:1] pc_execute = {(PC_BITS-2){1'b0}};
 
   // PC ALU output
   wire [PC_BITS-1:1] aguX, aguA, aguB;
@@ -361,6 +363,10 @@ module minimax (
 `endif
   end
 
+  // This register can be viewed in the resulting VCD file by setting
+  // the display type to "ASCII".
+  reg [9*8:0] opcode;
+
   always @(posedge clk) begin
 `ifdef COMPATIBLE_TRACE
       $write("%H\t", {pc_fetch, 1'b0});
@@ -371,37 +377,38 @@ module minimax (
       $write("%H\t", {aguX, 1'b0});
       $write("%H\t", inst);
 
-      if(op16_addi4spn)        $write("ADI4SPN");
-      else if(op16_lw)         $write("LW");
-      else if(op16_sw)         $write("SW");
-      else if(op16_addi)       $write("ADDI");
-      else if(op16_jal)        $write("JAL");
-      else if(op16_li)         $write("LI");
-      else if(op16_addi16sp)   $write("ADI16SP");
-      else if(op16_lui)        $write("LUI");
-      else if(op16_srli)       $write("SRLI");
-      else if(op16_srai)       $write("SRAI");
-      else if(op16_andi)       $write("ANDI");
-      else if(op16_sub)        $write("SUB");
-      else if(op16_xor)        $write("XOR");
-      else if(op16_or)         $write("OR");
-      else if(op16_and)        $write("AND");
-      else if(op16_j)          $write("J");
-      else if(op16_beqz)       $write("BEQZ");
-      else if(op16_bnez)       $write("BNEZ");
-      else if(op16_slli)       $write("SLLI");
-      else if(op16_lwsp)       $write("LWSP");
-      else if(op16_jr)         $write("JR");
-      else if(op16_mv)         $write("MV");
-      else if(op16_ebreak)     $write("EBREAK");
-      else if(op16_jalr)       $write("JALR");
-      else if(op16_add)        $write("ADD");
-      else if(op16_swsp)       $write("SWSP");
-      else if(op16_slli_thunk) $write("THUNK");
-      else if(op16_slli_setrd) $write("SETRD");
-      else if(op16_slli_setrs) $write("SETRS");
-      else if(op32)            $write("RV32I");
-      else                     $write("NOP?");
+      if(op16_addi4spn)        begin $write("ADI4SPN"); opcode = "ADI4SPN"; end
+      else if(op16_lw)         begin $write("LW"); opcode = "LW"; end
+      else if(op16_sw)         begin $write("SW"); opcode = "SW"; end
+      else if(op16_addi)       begin $write("ADDI"); opcode = "ADDI"; end
+      else if(op16_jal)        begin $write("JAL"); opcode = "JAL"; end
+      else if(op16_li)         begin $write("LI"); opcode = "LI"; end
+      else if(op16_addi16sp)   begin $write("ADI16SP"); opcode = "ADI16SP"; end
+      else if(op16_lui)        begin $write("LUI"); opcode = "LUI"; end
+      else if(op16_srli)       begin $write("SRLI"); opcode = "SRLI"; end
+      else if(op16_srai)       begin $write("SRAI"); opcode = "SRAI"; end
+      else if(op16_andi)       begin $write("ANDI"); opcode = "ANDI"; end
+      else if(op16_sub)        begin $write("SUB"); opcode = "SUB"; end
+      else if(op16_xor)        begin $write("XOR"); opcode = "XOR"; end
+      else if(op16_or)         begin $write("OR"); opcode = "OR"; end
+      else if(op16_and)        begin $write("AND"); opcode = "AND"; end
+      else if(op16_j)          begin $write("J"); opcode = "J"; end
+      else if(op16_beqz)       begin $write("BEQZ"); opcode = "BEQZ"; end
+      else if(op16_bnez)       begin $write("BNEZ"); opcode = "BNEZ"; end
+      else if(op16_slli)       begin $write("SLLI"); opcode = "SLLI"; end
+      else if(op16_lwsp)       begin $write("LWSP"); opcode = "LWSP"; end
+      else if(op16_jr)         begin $write("JR"); opcode = "JR"; end
+      else if(op16_mv)         begin $write("MV"); opcode = "MV"; end
+      else if(op16_ebreak)     begin $write("EBREAK"); opcode = "EBREAK"; end
+      else if(op16_jalr)       begin $write("JALR"); opcode = "JALR"; end
+      else if(op16_add)        begin $write("ADD"); opcode = "ADD"; end
+      else if(op16_swsp)       begin $write("SWSP"); opcode = "SWSP"; end
+      else if(op16_slli_thunk) begin $write("THUNK"); opcode = "THUNK"; end
+      else if(op16_slli_setrd) begin $write("SETRD"); opcode = "SETRD"; end
+      else if(op16_slli_setrs) begin $write("SETRS"); opcode = "SETRS"; end
+      else if(op32)            begin $write("RV32I"); opcode = "RV32I"; end
+      else if(bubble)          begin $write("BUBBL"); opcode = "BUBBLE"; end
+      else                     begin $write("NOP?"); opcode = "NOP?"; end
 
       $write("\t%H", addrD);
       $write("\t%H", addrS);
@@ -454,37 +461,38 @@ module minimax (
       $write("%8H ", {aguX, 1'b0});
       $write("%8H ", inst);
 
-      if(op16_addi4spn)        $write("ADDI4SPN");
-      else if(op16_lw)         $write("LW      ");
-      else if(op16_sw)         $write("SW      ");
-      else if(op16_addi)       $write("ADDI    ");
-      else if(op16_jal)        $write("JAL     ");
-      else if(op16_li)         $write("LI      ");
-      else if(op16_addi16sp)   $write("ADDI16SP");
-      else if(op16_lui)        $write("LUI     ");
-      else if(op16_srli)       $write("SRLI    ");
-      else if(op16_srai)       $write("SRAI    ");
-      else if(op16_andi)       $write("ANDI    ");
-      else if(op16_sub)        $write("SUB     ");
-      else if(op16_xor)        $write("XOR     ");
-      else if(op16_or)         $write("OR      ");
-      else if(op16_and)        $write("AND     ");
-      else if(op16_j)          $write("J       ");
-      else if(op16_beqz)       $write("BEQZ    ");
-      else if(op16_bnez)       $write("BNEZ    ");
-      else if(op16_slli)       $write("SLLI    ");
-      else if(op16_lwsp)       $write("LWSP    ");
-      else if(op16_jr)         $write("JR      ");
-      else if(op16_mv)         $write("MV      ");
-      else if(op16_ebreak)     $write("EBREAK  ");
-      else if(op16_jalr)       $write("JALR    ");
-      else if(op16_add)        $write("ADD     ");
-      else if(op16_swsp)       $write("SWSP    ");
-      else if(op16_slli_thunk) $write("THUNK   ");
-      else if(op16_slli_setrd) $write("SETRD   ");
-      else if(op16_slli_setrs) $write("SETRS   ");
-      else if(op32)            $write("RV32I   ");
-      else                     $write("NOP?    ");
+      if(op16_addi4spn)        begin $write("ADDI4SPN"); opcode = "ADDI4SPN"; end
+      else if(op16_lw)         begin $write("LW      "); opcode = "LW      "; end
+      else if(op16_sw)         begin $write("SW      "); opcode = "SW      "; end
+      else if(op16_addi)       begin $write("ADDI    "); opcode = "ADDI    "; end
+      else if(op16_jal)        begin $write("JAL     "); opcode = "JAL     "; end
+      else if(op16_li)         begin $write("LI      "); opcode = "LI      "; end
+      else if(op16_addi16sp)   begin $write("ADDI16SP"); opcode = "ADDI16SP"; end
+      else if(op16_lui)        begin $write("LUI     "); opcode = "LUI     "; end
+      else if(op16_srli)       begin $write("SRLI    "); opcode = "SRLI    "; end
+      else if(op16_srai)       begin $write("SRAI    "); opcode = "SRAI    "; end
+      else if(op16_andi)       begin $write("ANDI    "); opcode = "ANDI    "; end
+      else if(op16_sub)        begin $write("SUB     "); opcode = "SUB     "; end
+      else if(op16_xor)        begin $write("XOR     "); opcode = "XOR     "; end
+      else if(op16_or)         begin $write("OR      "); opcode = "OR      "; end
+      else if(op16_and)        begin $write("AND     "); opcode = "AND     "; end
+      else if(op16_j)          begin $write("J       "); opcode = "J       "; end
+      else if(op16_beqz)       begin $write("BEQZ    "); opcode = "BEQZ    "; end
+      else if(op16_bnez)       begin $write("BNEZ    "); opcode = "BNEZ    "; end
+      else if(op16_slli)       begin $write("SLLI    "); opcode = "SLLI    "; end
+      else if(op16_lwsp)       begin $write("LWSP    "); opcode = "LWSP    "; end
+      else if(op16_jr)         begin $write("JR      "); opcode = "JR      "; end
+      else if(op16_mv)         begin $write("MV      "); opcode = "MV      "; end
+      else if(op16_ebreak)     begin $write("EBREAK  "); opcode = "EBREAK  "; end
+      else if(op16_jalr)       begin $write("JALR    "); opcode = "JALR    "; end
+      else if(op16_add)        begin $write("ADD     "); opcode = "ADD     "; end
+      else if(op16_swsp)       begin $write("SWSP    "); opcode = "SWSP    "; end
+      else if(op16_slli_thunk) begin $write("THUNK   "); opcode = "THUNK   "; end
+      else if(op16_slli_setrd) begin $write("SETRD   "); opcode = "SETRD   "; end
+      else if(op16_slli_setrs) begin $write("SETRS   "); opcode = "SETRS   "; end
+      else if(op32)            begin $write("RV32I   "); opcode = "RV32I   "; end
+      else if(bubble)          begin $write("BUBBLE  "); opcode = "BUBBLE  "; end
+      else                     begin $write("NOP?    "); opcode = "NOP?    "; end
       
       $write("  %1b.%2H", addrD[5], addrD[4:0]);
       $write("  %1b.%2H", addrS[5], addrS[4:0]);
