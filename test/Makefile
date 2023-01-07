@@ -52,6 +52,7 @@ $(TESTS): dirs $$@/pass $$@/pass.verilog
 			-DCOMPATIBLE_TRACE \
 			-DENABLE_ASSERTS \
 			-DENABLE_TRACE \
+			-DENABLE_REGISTER_INSPECTION \
 			-DROM_FILENAME='"minimax.rom"' \
 			-DSKIP_MICROCODE \
 			../../rtl/minimax_tb.v ../../rtl/minimax.v \
@@ -60,7 +61,7 @@ $(TESTS): dirs $$@/pass $$@/pass.verilog
 # Massage the resulting error output so that it looks similar to fusesoc output
 # Note that this is required because Verilog's `$display()` has no ability to
 # print in all-caps, whereas fusesoc prints in capitals.
-	cat $*/log.verilog.raw | sed '/^WARNING: /d' | sed '/^ERROR: /d' | sed '/^VCD info: /d' | awk 'NR==1 {print $$0} NR>1 {print toupper($$0)}' > $*/log.verilog
+	cat $*/log.verilog.raw | sed '/^WARNING: /d' | sed '/^ERROR: /d' | sed '/^VCD info: /d' | LC_ALL=C awk 'NR==1 {print $$0} NR>1 {print toupper($$0)}' > $*/log.verilog
 	touch $@
 
 # .mem generator
