@@ -11,7 +11,7 @@ module gf180mcu_sram_512x32(
     wire [7:0] wen_mask;
     reg was_reset;
 
-    assign wen_mask = {8{wen}};
+    assign wen_mask = {8{~wen}};
 
     reg was_en;
     wire cen;
