@@ -46,7 +46,7 @@ module minimax_tb;
 
     reg clk_2x;
     wire cpu_clk;
-    wire mem_clk;
+    wire bank_clk;
     reg cpu_reset, mem_reset;
 
     reg [31:0] ticks;
@@ -54,9 +54,8 @@ module minimax_tb;
 
     // Run clock at 10 ns
     always #5 clk_2x <= (clk_2x === 1'b0);
-    assign cpu_clk = ticks[1];
-    // assign cpu_clk = ticks[1] & ticks[0];
-    assign mem_clk = ~ticks[1] & ticks[0];
+    assign cpu_clk = clk_2x;//ticks[0];
+    assign bank_clk = ~clk_2x;
 
     initial begin
         clk_2x = 0;
@@ -155,8 +154,6 @@ module minimax_tb;
         | (rdata_bank3 & {32{(ram_addr[12:11] == 2'h3)}});
 
     // Bytes 0-2047
-    wire bank_clk;
-    assign bank_clk = clk_2x;
     wire [31:0] rdata_bank0;
     gf180mcu_sram_512x32 bank0 (
         .clk(bank_clk),
