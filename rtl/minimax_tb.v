@@ -107,70 +107,27 @@ module minimax_tb;
         end
     end
 
-    reg [15:0] inst_lat;
-    reg [15:0] inst_reg, inst_reg_ram;
+    reg [15:0] inst_reg;
     wire inst_regce;
 
     wire [PC_BITS-1:0] inst_addr;
     wire [31:0] addr, wdata;
-    reg [31:0] rdata;
     wire [3:0] wmask;
     wire rreq;
 
-    // reg [31:0] ram_addr;
     wire [31:0] ram_addr;
-    // assign ram_addr = (rreq ? addr : inst_addr);
-    wire [31:0] rdata_ram;
-
-    reg [15:0] inst_lat_ram;
-    always @(posedge cpu_clk) begin
-        inst_lat_ram <= ~inst_addr[1] ? rdata_ram[15:0] : rdata_ram[31:16];
-    end
-
-    reg [31:0] rom_window;
-    reg [31:0] ram_window;
-    always @(posedge cpu_clk) begin
-        ram_window <= rdata_ram;
-        rom_window <= {rom_array[ticks * 2 + 1], rom_array[ticks * 2]};
-    end
+    wire [31:0] rdata;
+    reg [15:0] inst_lat;
+    reg [31:0] rdata_lat;
 
     assign ram_addr = cpu_reset ? 32'b0 : (({32{(|rreq)}} & addr)
                                         | ({32{(~|rreq)}} & inst_addr));
 
     always @(posedge cpu_clk) begin
-
-        // Only support one access to memory at a time:
-        //
-        //   * Write data to RAM
-        //   * Read data from RAM
-        //   * Read an instruction
-        //
-        // Minimax will stall its pipeline any time it needs to read data
-        // from memory. If it is compiled with BUBBLE_STORES defined, then
-        // it will also delay for one cycle when storing data.
-        //
-        // This is necessary due to the GF180 memories being single-ported.
-        if (wmask == 4'hf) begin
-            rom_array[addr[PC_BITS-1:1]+1] <= wdata[31:16];
-            rom_array[addr[PC_BITS-1:1]] <= wdata[15:0];
-            inst_lat <= 16'b0;
-            rdata <= 1'b0;
-        end else if (rreq) begin
-            inst_lat <= 16'b0;
-            rdata <= {rom_array[{addr[PC_BITS-1:2], 1'b1}], rom_array[{addr[PC_BITS-1:2], 1'b0}]};
-            // rdata <= ram_window;
-        end else begin
-            rdata <= 32'b0;
-            if (inst_addr[1])
-                inst_lat <= rom_array[{inst_addr[PC_BITS-1:2], 1'b1}];
-            else
-                inst_lat <= rom_array[{inst_addr[PC_BITS-1:2], 1'b0}];
-        end
-
+        inst_lat <= ~inst_addr[1] ? rdata[15:0] : rdata[31:16];
+        rdata_lat <= rdata;
         if (inst_regce) begin
-            // inst_reg <= inst_lat;
-            inst_reg <= inst_lat_ram;
-            inst_reg_ram <= inst_lat_ram;
+            inst_reg <= inst_lat;
         end
     end
 
@@ -186,12 +143,12 @@ module minimax_tb;
         .inst_regce(inst_regce),
         .addr(addr),
         .wdata(wdata),
-        .rdata(ram_window),
+        .rdata(rdata_lat),
         .wmask(wmask),
         .rreq(rreq)
     );
 
-    assign rdata_ram = 
+    assign rdata =
           (rdata_bank0 & {32{(ram_addr[12:11] == 2'h0)}})
         | (rdata_bank1 & {32{(ram_addr[12:11] == 2'h1)}})
         | (rdata_bank2 & {32{(ram_addr[12:11] == 2'h2)}})
