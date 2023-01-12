@@ -163,7 +163,11 @@ module minimax (
   // Data bus outputs tap directly off register/ALU path.
   assign wdata = regD;
   assign addr = aluS;
-  assign rreq = op16_lwsp | op16_lw;
+  assign rreq = op16_lwsp | op16_lw
+`ifdef BUBBLE_STORES
+   | op16_sw | op16_swsp
+`endif
+  ;
   assign wmask = 4'b1111 & {4{op16_swsp | op16_sw}};
 
   // Instruction bus outputs do too
