@@ -54,8 +54,12 @@ $(TESTS): dirs $$@/pass $$@/pass.verilog
 			-DENABLE_TRACE \
 			-DENABLE_REGISTER_INSPECTION \
 			-DROM_FILENAME='"minimax.rom"' \
+			-DBUBBLE_STORES \
 			-DSKIP_MICROCODE \
-			../../rtl/minimax_tb.v ../../rtl/minimax.v \
+			../../rtl/minimax_tb.v \
+			../../rtl/minimax.v \
+			../../rtl/gf180mcu_sram_512x32.v \
+			../../rtl/gf180mcu_fd_ip_sram__sram512x8m8wm1.v \
 		&& \
 		$(VVP) -N ./test-harness.vvp > log.verilog.raw
 # Massage the resulting error output so that it looks similar to fusesoc output
