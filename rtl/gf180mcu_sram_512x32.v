@@ -19,7 +19,7 @@ module gf180mcu_sram_512x32(
     // want: If `en` is 1, then when clk is high we should transition
     // high->low then low->high
 
-    assign cen = ~(en & ~was_en);
+    assign cen = ~(en & ~was_en | clk);
     always @(posedge clk) begin
         if (reset)
             was_en <= 1'b0;
