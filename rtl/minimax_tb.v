@@ -74,31 +74,31 @@ module minimax_tb;
         `endif
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank0.ram0.mem[i] = rom_array[i * 2] >> 0;
-            bank0.ram1.mem[i] = rom_array[i * 2] >> 8;
-            bank0.ram2.mem[i] = rom_array[i * 2 + 1] >> 0;
-            bank0.ram3.mem[i] = rom_array[i * 2 + 1] >> 8;
+            bank0.ram1.mem[i] = rom_array[i * 2] >> 0;
+            bank0.ram2.mem[i] = rom_array[i * 2] >> 8;
+            bank0.ram3.mem[i] = rom_array[i * 2 + 1] >> 0;
+            bank0.ram4.mem[i] = rom_array[i * 2 + 1] >> 8;
         end
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank1.ram0.mem[i] = rom_array[1024 + i * 2] >> 0;
-            bank1.ram1.mem[i] = rom_array[1024 + i * 2] >> 8;
-            bank1.ram2.mem[i] = rom_array[1024 + i * 2 + 1] >> 0;
-            bank1.ram3.mem[i] = rom_array[1024 + i * 2 + 1] >> 8;
+            bank1.ram1.mem[i] = rom_array[1024 + i * 2] >> 0;
+            bank1.ram2.mem[i] = rom_array[1024 + i * 2] >> 8;
+            bank1.ram3.mem[i] = rom_array[1024 + i * 2 + 1] >> 0;
+            bank1.ram4.mem[i] = rom_array[1024 + i * 2 + 1] >> 8;
         end
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank2.ram0.mem[i] = rom_array[2*1024 + i * 2] >> 0;
-            bank2.ram1.mem[i] = rom_array[2*1024 + i * 2] >> 8;
-            bank2.ram2.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 0;
-            bank2.ram3.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 8;
+            bank2.ram1.mem[i] = rom_array[2*1024 + i * 2] >> 0;
+            bank2.ram2.mem[i] = rom_array[2*1024 + i * 2] >> 8;
+            bank2.ram3.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 0;
+            bank2.ram4.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 8;
         end
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank3.ram0.mem[i] = rom_array[3*1024 + i * 2] >> 0;
-            bank3.ram1.mem[i] = rom_array[3*1024 + i * 2] >> 8;
-            bank3.ram2.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 0;
-            bank3.ram3.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 8;
+            bank3.ram1.mem[i] = rom_array[3*1024 + i * 2] >> 0;
+            bank3.ram2.mem[i] = rom_array[3*1024 + i * 2] >> 8;
+            bank3.ram3.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 0;
+            bank3.ram4.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 8;
         end
 
         forever begin

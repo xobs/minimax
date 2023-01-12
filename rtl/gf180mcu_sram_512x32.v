@@ -27,7 +27,11 @@ module gf180mcu_sram_512x32(
             was_en <= ~cen;
     end
 
-    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram0 (
+    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram1 (
+`ifdef USE_POWER_PINS
+        .VDD(1'b1),
+        .VSS(1'b0),
+`endif
         .CLK(clk),
         .CEN(cen),
         .GWEN(~wen),
@@ -37,7 +41,11 @@ module gf180mcu_sram_512x32(
         .Q(rdata[7:0])
     );
 
-    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram1 (
+    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram2 (
+`ifdef USE_POWER_PINS
+        .VDD(1'b1),
+        .VSS(1'b0),
+`endif
         .CLK(clk),
         .CEN(cen),
         .GWEN(~wen),
@@ -47,7 +55,11 @@ module gf180mcu_sram_512x32(
         .Q(rdata[15:8])
     );
 
-    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram2 (
+    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram3 (
+`ifdef USE_POWER_PINS
+        .VDD(1'b1),
+        .VSS(1'b0),
+`endif
         .CLK(clk),
         .CEN(cen),
         .GWEN(~wen),
@@ -57,7 +69,11 @@ module gf180mcu_sram_512x32(
         .Q(rdata[23:16])
     );
 
-    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram3 (
+    gf180mcu_fd_ip_sram__sram512x8m8wm1 ram4 (
+`ifdef USE_POWER_PINS
+        .VDD(1'b1),
+        .VSS(1'b0),
+`endif
         .CLK(clk),
         .CEN(cen),
         .GWEN(~wen),
@@ -66,4 +82,21 @@ module gf180mcu_sram_512x32(
         .D(wdata[31:24]),
         .Q(rdata[31:24])
     );
+
 endmodule
+
+`ifdef BLACKBOX_SRAM
+(*blackbox*)
+module gf180mcu_fd_ip_sram__sram512x8m8wm1 (
+    input           CLK,
+    input           CEN,    //Chip Enable
+    input           GWEN,   //Global Write Enable
+    input   [8:0]  	WEN,    //Write Enable
+    input   [8:0]   A,
+    input   [8:0]  	D,
+    output	[8:0]	Q,
+    inout		VDD,
+    inout		VSS
+);
+endmodule
+`endif
