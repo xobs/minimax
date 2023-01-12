@@ -44,20 +44,22 @@ module minimax_tb;
     parameter MICROCODE_FILENAME = `MICROCODE_FILENAME;
     parameter TRACE = `TRACE;
 
-    reg clk;
     reg clk_2x;
-    reg reset;
+    wire cpu_clk;
+    wire mem_clk;
+    reg cpu_reset, mem_reset;
 
     reg [31:0] ticks;
-    reg [31:0] ticks_2x;
     reg [15:0] rom_array [0:8191];
 
     // Run clock at 10 ns
     always #5 clk_2x <= (clk_2x === 1'b0);
-    always #10 clk <= (clk === 1'b0);
+    assign cpu_clk = ticks[1];
+    // assign cpu_clk = ticks[1] & ticks[0];
+    assign mem_clk = ~ticks[1] & ticks[0];
 
     initial begin
-        clk = 0;
+        clk_2x = 0;
     end
 
     integer i;
@@ -106,7 +108,7 @@ module minimax_tb;
     end
 
     reg [15:0] inst_lat;
-    reg [15:0] inst_reg;
+    reg [15:0] inst_reg, inst_reg_ram;
     wire inst_regce;
 
     wire [PC_BITS-1:0] inst_addr;
@@ -117,23 +119,25 @@ module minimax_tb;
 
     // reg [31:0] ram_addr;
     wire [31:0] ram_addr;
-    assign ram_addr = (inst_addr + 2);
+    // assign ram_addr = (rreq ? addr : inst_addr);
     wire [31:0] rdata_ram;
-    wire [15:0] inst_lat_ram;
-    assign inst_lat_ram = inst_addr[1] ? rdata_ram[15:0] : rdata_ram[31:16];
+
+    reg [15:0] inst_lat_ram;
+    always @(posedge cpu_clk) begin
+        inst_lat_ram <= ~inst_addr[1] ? rdata_ram[15:0] : rdata_ram[31:16];
+    end
 
     reg [31:0] rom_window;
     reg [31:0] ram_window;
-    always @(posedge clk) begin
-        // ram_addr <= ticks * 4 + 16'h800;
+    always @(posedge cpu_clk) begin
         ram_window <= rdata_ram;
-        rom_window <= {rom_array[ticks * 2 + 1 + 16'h400], rom_array[ticks * 2 + 16'h400]};
+        rom_window <= {rom_array[ticks * 2 + 1], rom_array[ticks * 2]};
     end
 
-    // assign ram_addr = ({32{(|rreq)}} & addr)
-    //                 | ({32{(~|rreq)}} & inst_addr);
+    assign ram_addr = cpu_reset ? 32'b0 : (({32{(|rreq)}} & addr)
+                                        | ({32{(~|rreq)}} & inst_addr));
 
-    always @(posedge clk) begin
+    always @(posedge cpu_clk) begin
 
         // Only support one access to memory at a time:
         //
@@ -154,6 +158,7 @@ module minimax_tb;
         end else if (rreq) begin
             inst_lat <= 16'b0;
             rdata <= {rom_array[{addr[PC_BITS-1:2], 1'b1}], rom_array[{addr[PC_BITS-1:2], 1'b0}]};
+            // rdata <= ram_window;
         end else begin
             rdata <= 32'b0;
             if (inst_addr[1])
@@ -163,7 +168,9 @@ module minimax_tb;
         end
 
         if (inst_regce) begin
-            inst_reg <= inst_lat;
+            // inst_reg <= inst_lat;
+            inst_reg <= inst_lat_ram;
+            inst_reg_ram <= inst_lat_ram;
         end
     end
 
@@ -172,14 +179,14 @@ module minimax_tb;
         .PC_BITS(PC_BITS),
         .UC_BASE(UC_BASE)
     ) dut (
-        .clk(clk),
-        .reset(reset),
+        .clk(cpu_clk),
+        .reset(cpu_reset),
         .inst_addr(inst_addr),
         .inst(inst_reg),
         .inst_regce(inst_regce),
         .addr(addr),
         .wdata(wdata),
-        .rdata(rdata),
+        .rdata(ram_window),
         .wmask(wmask),
         .rreq(rreq)
     );
@@ -191,10 +198,12 @@ module minimax_tb;
         | (rdata_bank3 & {32{(ram_addr[12:11] == 2'h3)}});
 
     // Bytes 0-2047
+    wire bank_clk;
+    assign bank_clk = clk_2x;
     wire [31:0] rdata_bank0;
     gf180mcu_sram_512x32 bank0 (
-        .clk(clk_2x),
-        .reset(reset),
+        .clk(bank_clk),
+        .reset(mem_reset),
         .en(ram_addr[12:11] == 2'h0),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank0),
@@ -205,8 +214,8 @@ module minimax_tb;
     // Bytes 2048-4097
     wire [31:0] rdata_bank1;
     gf180mcu_sram_512x32 bank1 (
-        .clk(clk_2x),
-        .reset(reset),
+        .clk(bank_clk),
+        .reset(mem_reset),
         .en(ram_addr[12:11] == 2'h1),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank1),
@@ -217,8 +226,8 @@ module minimax_tb;
     // Bytes 4098-6143
     wire [31:0] rdata_bank2;
     gf180mcu_sram_512x32 bank2 (
-        .clk(clk_2x),
-        .reset(reset),
+        .clk(bank_clk),
+        .reset(mem_reset),
         .en(ram_addr[12:11] == 2'h2),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank2),
@@ -229,8 +238,8 @@ module minimax_tb;
     // Bytes 6144-8191
     wire [31:0] rdata_bank3;
     gf180mcu_sram_512x32 bank3 (
-        .clk(clk_2x),
-        .reset(reset),
+        .clk(bank_clk),
+        .reset(mem_reset),
         .en(ram_addr[12:11] == 2'h3),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank3),
@@ -239,26 +248,27 @@ module minimax_tb;
     );
 
     initial begin
-        reset <= 1'b1;
-        #96;
-        reset <= 1'b0;
+        cpu_reset <= 1'b1;
+        mem_reset <= 1'b1;
+        #40
+        mem_reset <= 1'b0;
+        #36;
+        cpu_reset <= 1'b0;
     end
 
     initial begin
         ticks <= 0;
-        ticks_2x <= 0;
     end
 
     always @(posedge clk_2x) begin
-        ticks_2x <= ticks_2x + 1;
+        if (cpu_reset) ticks <= 0; else ticks <= ticks + 1;
     end
 
     // Capture test exit conditions - timeout or quit
-    always @(posedge clk)
+    always @(posedge clk_2x)
     begin
         // Track ticks counter and bail if we took too long
-        ticks <= ticks + 1;
-        if (MAXTICKS != -1 && ticks >= MAXTICKS) begin
+        if (MAXTICKS != -1 && ticks >= (MAXTICKS * 4)) begin
             $display("FAIL: Exceeded MAXTICKS of %0d", MAXTICKS);
             $finish_and_return(1);
         end
