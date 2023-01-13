@@ -1,5 +1,9 @@
 
 module minimax (
+`ifdef USE_POWER_PINS
+    inout vdd,	// User area 1 1.8V supply
+    inout vss,	// User area 1 digital ground
+`endif
    input  clk,
    input  reset,
    input  [15:0] inst,
@@ -18,9 +22,6 @@ module minimax (
 
   wire [31:0] uc_base;
   assign uc_base = UC_BASE;
-
-  // Register file
-  reg [31:0] register_file[63:0];
 
   // Register file address ports
   wire [5:0] addrS, addrD;
@@ -258,12 +259,22 @@ module minimax (
   assign bD_banksel = (microcode ^ dly16_slli_setrd) | trap;
   assign bS_banksel = (microcode ^ dly16_slli_setrs) | trap;
 
-  assign addrD = {bD_banksel, addrD_port};
-  assign addrS = {bS_banksel, addrS_port};
-
-  // Look up register file contents combinatorially
-  assign regD = register_file[addrD];
-  assign regS = register_file[addrS];
+  (*blackbox*)
+  minimax_rf regfile (
+`ifdef USE_POWER_PINS
+    .vdd(vdd),	// User area 1 1.8V supply
+    .vss(vss),	// User area 1 digital ground
+`endif
+    .clk(clk),
+    .addrS(addrS_port),
+    .addrD(addrD_port),
+    .new_value(aluX),
+    .we(wb),
+    .rS_microcode(bS_banksel),
+    .rD_microcode(bD_banksel),
+    .rS(regS),
+    .rD(regD)
+  );
 
   assign aluA = (regD & {32{op16_add | op16_addi | op16_sub
                     | op16_and | op16_andi
@@ -316,14 +327,6 @@ module minimax (
              op16_andi | op16_mv | op16_add |
              op16_and | op16_or | op16_xor | op16_sub |
              op16_slli | op16_srli | op16_srai;
-
-  // Regs proc
-  always @(posedge clk) begin
-    // writeback
-    if (|(addrD[4:0]) & wb) begin
-      register_file[addrD] <= aluX;
-    end
-  end
 
   // Tracing
 `ifdef ENABLE_TRACE
@@ -543,207 +546,5 @@ module minimax (
 `endif // `ifdef COMPATIBLE_TRACE
     end
 `endif // `ifdef ENABLE_TRACE
-
-  initial begin
-    register_file[63] = 32'b00000000000000000000000000000000;
-    register_file[62] = 32'b00000000000000000000000000000000;
-    register_file[61] = 32'b00000000000000000000000000000000;
-    register_file[60] = 32'b00000000000000000000000000000000;
-    register_file[59] = 32'b00000000000000000000000000000000;
-    register_file[58] = 32'b00000000000000000000000000000000;
-    register_file[57] = 32'b00000000000000000000000000000000;
-    register_file[56] = 32'b00000000000000000000000000000000;
-    register_file[55] = 32'b00000000000000000000000000000000;
-    register_file[54] = 32'b00000000000000000000000000000000;
-    register_file[53] = 32'b00000000000000000000000000000000;
-    register_file[52] = 32'b00000000000000000000000000000000;
-    register_file[51] = 32'b00000000000000000000000000000000;
-    register_file[50] = 32'b00000000000000000000000000000000;
-    register_file[49] = 32'b00000000000000000000000000000000;
-    register_file[48] = 32'b00000000000000000000000000000000;
-    register_file[47] = 32'b00000000000000000000000000000000;
-    register_file[46] = 32'b00000000000000000000000000000000;
-    register_file[45] = 32'b00000000000000000000000000000000;
-    register_file[44] = 32'b00000000000000000000000000000000;
-    register_file[43] = 32'b00000000000000000000000000000000;
-    register_file[42] = 32'b00000000000000000000000000000000;
-    register_file[41] = 32'b00000000000000000000000000000000;
-    register_file[40] = 32'b00000000000000000000000000000000;
-    register_file[39] = 32'b00000000000000000000000000000000;
-    register_file[38] = 32'b00000000000000000000000000000000;
-    register_file[37] = 32'b00000000000000000000000000000000;
-    register_file[36] = 32'b00000000000000000000000000000000;
-    register_file[35] = 32'b00000000000000000000000000000000;
-    register_file[34] = 32'b00000000000000000000000000000000;
-    register_file[33] = 32'b00000000000000000000000000000000;
-    register_file[32] = 32'b00000000000000000000000000000000;
-    register_file[31] = 32'b00000000000000000000000000000000;
-    register_file[30] = 32'b00000000000000000000000000000000;
-    register_file[29] = 32'b00000000000000000000000000000000;
-    register_file[28] = 32'b00000000000000000000000000000000;
-    register_file[27] = 32'b00000000000000000000000000000000;
-    register_file[26] = 32'b00000000000000000000000000000000;
-    register_file[25] = 32'b00000000000000000000000000000000;
-    register_file[24] = 32'b00000000000000000000000000000000;
-    register_file[23] = 32'b00000000000000000000000000000000;
-    register_file[22] = 32'b00000000000000000000000000000000;
-    register_file[21] = 32'b00000000000000000000000000000000;
-    register_file[20] = 32'b00000000000000000000000000000000;
-    register_file[19] = 32'b00000000000000000000000000000000;
-    register_file[18] = 32'b00000000000000000000000000000000;
-    register_file[17] = 32'b00000000000000000000000000000000;
-    register_file[16] = 32'b00000000000000000000000000000000;
-    register_file[15] = 32'b00000000000000000000000000000000;
-    register_file[14] = 32'b00000000000000000000000000000000;
-    register_file[13] = 32'b00000000000000000000000000000000;
-    register_file[12] = 32'b00000000000000000000000000000000;
-    register_file[11] = 32'b00000000000000000000000000000000;
-    register_file[10] = 32'b00000000000000000000000000000000;
-    register_file[9] = 32'b00000000000000000000000000000000;
-    register_file[8] = 32'b00000000000000000000000000000000;
-    register_file[7] = 32'b00000000000000000000000000000000;
-    register_file[6] = 32'b00000000000000000000000000000000;
-    register_file[5] = 32'b00000000000000000000000000000000;
-    register_file[4] = 32'b00000000000000000000000000000000;
-    register_file[3] = 32'b00000000000000000000000000000000;
-    register_file[2] = 32'b00000000000000000000000000000000;
-    register_file[1] = 32'b00000000000000000000000000000000;
-    register_file[0] = 32'b00000000000000000000000000000000;
-  end
-
-`ifdef ENABLE_REGISTER_INSPECTION
-  // Wires that make it easier to inspect the register file during simulation
-  wire [31:0] cpu_x0;
-  wire [31:0] cpu_x1;
-  wire [31:0] cpu_x2;
-  wire [31:0] cpu_x3;
-  wire [31:0] cpu_x4;
-  wire [31:0] cpu_x5;
-  wire [31:0] cpu_x6;
-  wire [31:0] cpu_x7;
-  wire [31:0] cpu_x8;
-  wire [31:0] cpu_x9;
-  wire [31:0] cpu_x10;
-  wire [31:0] cpu_x11;
-  wire [31:0] cpu_x12;
-  wire [31:0] cpu_x13;
-  wire [31:0] cpu_x14;
-  wire [31:0] cpu_x15;
-  wire [31:0] cpu_x16;
-  wire [31:0] cpu_x17;
-  wire [31:0] cpu_x18;
-  wire [31:0] cpu_x19;
-  wire [31:0] cpu_x20;
-  wire [31:0] cpu_x21;
-  wire [31:0] cpu_x22;
-  wire [31:0] cpu_x23;
-  wire [31:0] cpu_x24;
-  wire [31:0] cpu_x25;
-  wire [31:0] cpu_x26;
-  wire [31:0] cpu_x27;
-  wire [31:0] cpu_x28;
-  wire [31:0] cpu_x29;
-  wire [31:0] cpu_x30;
-  wire [31:0] cpu_x31;
-
-  wire [31:0] uc_x0;
-  wire [31:0] uc_x1;
-  wire [31:0] uc_x2;
-  wire [31:0] uc_x3;
-  wire [31:0] uc_x4;
-  wire [31:0] uc_x5;
-  wire [31:0] uc_x6;
-  wire [31:0] uc_x7;
-  wire [31:0] uc_x8;
-  wire [31:0] uc_x9;
-  wire [31:0] uc_x10;
-  wire [31:0] uc_x11;
-  wire [31:0] uc_x12;
-  wire [31:0] uc_x13;
-  wire [31:0] uc_x14;
-  wire [31:0] uc_x15;
-  wire [31:0] uc_x16;
-  wire [31:0] uc_x17;
-  wire [31:0] uc_x18;
-  wire [31:0] uc_x19;
-  wire [31:0] uc_x20;
-  wire [31:0] uc_x21;
-  wire [31:0] uc_x22;
-  wire [31:0] uc_x23;
-  wire [31:0] uc_x24;
-  wire [31:0] uc_x25;
-  wire [31:0] uc_x26;
-  wire [31:0] uc_x27;
-  wire [31:0] uc_x28;
-  wire [31:0] uc_x29;
-  wire [31:0] uc_x30;
-  wire [31:0] uc_x31;
-
-  assign cpu_x0 = register_file[0];
-  assign cpu_x1 = register_file[1];
-  assign cpu_x2 = register_file[2];
-  assign cpu_x3 = register_file[3];
-  assign cpu_x4 = register_file[4];
-  assign cpu_x5 = register_file[5];
-  assign cpu_x6 = register_file[6];
-  assign cpu_x7 = register_file[7];
-  assign cpu_x8 = register_file[8];
-  assign cpu_x9 = register_file[9];
-  assign cpu_x10 = register_file[10];
-  assign cpu_x11 = register_file[11];
-  assign cpu_x12 = register_file[12];
-  assign cpu_x13 = register_file[13];
-  assign cpu_x14 = register_file[14];
-  assign cpu_x15 = register_file[15];
-  assign cpu_x16 = register_file[16];
-  assign cpu_x17 = register_file[17];
-  assign cpu_x18 = register_file[18];
-  assign cpu_x19 = register_file[19];
-  assign cpu_x20 = register_file[20];
-  assign cpu_x21 = register_file[21];
-  assign cpu_x22 = register_file[22];
-  assign cpu_x23 = register_file[23];
-  assign cpu_x24 = register_file[24];
-  assign cpu_x25 = register_file[25];
-  assign cpu_x26 = register_file[26];
-  assign cpu_x27 = register_file[27];
-  assign cpu_x28 = register_file[28];
-  assign cpu_x29 = register_file[29];
-  assign cpu_x30 = register_file[30];
-  assign cpu_x31 = register_file[31];
-
-  assign uc_x0 = register_file[0 + 32];
-  assign uc_x1 = register_file[1 + 32];
-  assign uc_x2 = register_file[2 + 32];
-  assign uc_x3 = register_file[3 + 32];
-  assign uc_x4 = register_file[4 + 32];
-  assign uc_x5 = register_file[5 + 32];
-  assign uc_x6 = register_file[6 + 32];
-  assign uc_x7 = register_file[7 + 32];
-  assign uc_x8 = register_file[8 + 32];
-  assign uc_x9 = register_file[9 + 32];
-  assign uc_x10 = register_file[10 + 32];
-  assign uc_x11 = register_file[11 + 32];
-  assign uc_x12 = register_file[12 + 32];
-  assign uc_x13 = register_file[13 + 32];
-  assign uc_x14 = register_file[14 + 32];
-  assign uc_x15 = register_file[15 + 32];
-  assign uc_x16 = register_file[16 + 32];
-  assign uc_x17 = register_file[17 + 32];
-  assign uc_x18 = register_file[18 + 32];
-  assign uc_x19 = register_file[19 + 32];
-  assign uc_x20 = register_file[20 + 32];
-  assign uc_x21 = register_file[21 + 32];
-  assign uc_x22 = register_file[22 + 32];
-  assign uc_x23 = register_file[23 + 32];
-  assign uc_x24 = register_file[24 + 32];
-  assign uc_x25 = register_file[25 + 32];
-  assign uc_x26 = register_file[26 + 32];
-  assign uc_x27 = register_file[27 + 32];
-  assign uc_x28 = register_file[28 + 32];
-  assign uc_x29 = register_file[29 + 32];
-  assign uc_x30 = register_file[30 + 32];
-  assign uc_x31 = register_file[31 + 32];
-`endif // `ifdef ENABLE_REGISTER_INSPECTION
 
 endmodule
