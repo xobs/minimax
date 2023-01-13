@@ -58,6 +58,7 @@ $(TESTS): dirs $$@/pass $$@/pass.verilog
 			-DSKIP_MICROCODE \
 			../../rtl/minimax_tb.v \
 			../../rtl/minimax.v \
+			../../rtl/minimax_rf.v \
 			../../rtl/gf180mcu_sram_512x32.v \
 			../../rtl/gf180mcu_fd_ip_sram__sram512x8m8wm1.v \
 		&& \

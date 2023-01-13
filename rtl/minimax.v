@@ -1,9 +1,5 @@
 
 module minimax (
-`ifdef USE_POWER_PINS
-    inout vdd,	// User area 1 1.8V supply
-    inout vss,	// User area 1 digital ground
-`endif
    input  clk,
    input  reset,
    input  [15:0] inst,
@@ -28,6 +24,7 @@ module minimax (
   wire [4:0] addrD_port, addrS_port;
   wire bD_banksel, bS_banksel;
   wire [31:0] regS, regD, aluA, aluB, aluS, aluX;
+  wire [31:0] regS_ex, regS_uc, regD_ex, regD_uc;
 
   // Program counter
   reg [PC_BITS-1:1] pc_fetch = {(PC_BITS-2){1'b0}};
@@ -259,21 +256,27 @@ module minimax (
   assign bD_banksel = (microcode ^ dly16_slli_setrd) | trap;
   assign bS_banksel = (microcode ^ dly16_slli_setrs) | trap;
 
-  (*blackbox*)
-  minimax_rf regfile (
-`ifdef USE_POWER_PINS
-    .vdd(vdd),	// User area 1 1.8V supply
-    .vss(vss),	// User area 1 digital ground
-`endif
+  assign regS = bS_banksel ? regS_uc : regS_ex;
+  assign regD = bD_banksel ? regD_uc : regD_ex;
+
+  minimax_rf regfile_execution (
     .clk(clk),
     .addrS(addrS_port),
     .addrD(addrD_port),
     .new_value(aluX),
-    .we(wb),
-    .rS_microcode(bS_banksel),
-    .rD_microcode(bD_banksel),
-    .rS(regS),
-    .rD(regD)
+    .we(wb & ~bD_banksel),
+    .rS(regS_ex),
+    .rD(regD_ex)
+  );
+
+  minimax_rf regfile_microcode (
+    .clk(clk),
+    .addrS(addrS_port),
+    .addrD(addrD_port),
+    .new_value(aluX),
+    .we(wb & bD_banksel),
+    .rS(regS_uc),
+    .rD(regD_uc)
   );
 
   assign aluA = (regD & {32{op16_add | op16_addi | op16_sub
