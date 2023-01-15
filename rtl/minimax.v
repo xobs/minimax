@@ -1,5 +1,9 @@
 
 module minimax (
+`ifdef USE_POWER_PINS
+    inout vdd,	// User area 1 1.8V supply
+    inout vss,	// User area 1 digital ground
+`endif
    input  clk,
    input  reset,
    input  [15:0] inst,
@@ -260,6 +264,10 @@ module minimax (
   assign regD = bD_banksel ? regD_uc : regD_ex;
 
   minimax_rf regfile_execution (
+`ifdef USE_POWER_PINS
+    .vdd(vdd),
+    .vss(vss),
+`endif
     .clk(clk),
     .addrS(addrS_port),
     .addrD(addrD_port),
@@ -270,6 +278,10 @@ module minimax (
   );
 
   minimax_rf regfile_microcode (
+`ifdef USE_POWER_PINS
+    .vdd(vdd),
+    .vss(vss),
+`endif
     .clk(clk),
     .addrS(addrS_port),
     .addrD(addrD_port),
