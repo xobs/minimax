@@ -259,10 +259,15 @@ module minimax (
   assign bD_banksel = (microcode ^ dly16_slli_setrd) | trap;
   assign bS_banksel = (microcode ^ dly16_slli_setrs) | trap;
 
-  assign regS = bS_banksel ? regS_uc : regS_ex;
-  assign regD = bD_banksel ? regD_uc : regD_ex;
+  wire regD_x0;
+  wire regS_x0;
+  assign regD_x0 = (addrD_port == 5'd0);
+  assign regS_x0 = (addrS_port == 5'd0);
 
-  RAM32_1RW1R regfile_execution (
+  assign regS = regS_x0 ? 32'b0 : (bS_banksel ? regS_uc : regS_ex);
+  assign regD = regD_x0 ? 32'b0 : (bD_banksel ? regD_uc : regD_ex);
+
+  RAM32_1RW1R #(.WSIZE(4)) regfile_execution (
 `ifdef USE_POWER_PINS
     .VDD(vdd),
     .VSS(vss),
@@ -275,10 +280,10 @@ module minimax (
     .Di0(aluX),
     .Do0(regD_ex),
     .Do1(regS_ex),
-    .WE0({4{wb & ~bD_banksel}})
+    .WE0({4{wb & ~bD_banksel & ~regD_x0}})
   );
 
-  RAM32_1RW1R regfile_microcode (
+  RAM32_1RW1R #(.WSIZE(4)) regfile_microcode (
 `ifdef USE_POWER_PINS
     .VDD(vdd),
     .VSS(vss),
@@ -291,7 +296,7 @@ module minimax (
     .Di0(aluX),
     .Do0(regD_uc),
     .Do1(regS_uc),
-    .WE0({4{wb & bD_banksel}})
+    .WE0({4{wb & bD_banksel & ~regD_x0}})
   );
 
   assign aluA = (regD & {32{op16_add | op16_addi | op16_sub
