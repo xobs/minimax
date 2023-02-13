@@ -235,7 +235,7 @@ module minimax (
   // READ/WRITE register file port
   assign addrD_port = (dra & {5{dly16_slli_setrd | dly16_lw | dly16_lwsp}})
     | (5'b00001 & {5{op16_jal | op16_jalr | trap}}) // write return address into ra
-    | ({2'b01, inst[4:2]} & {5{op16_addi4spn | op16_sw}}) // data
+    | ({2'b01, inst[5:2]} & {5{op16_addi4spn | op16_sw}}) // data
     | (inst[6:2] & {5{op16_swsp}})
     | (inst[11:7] & ({5{op16_addi | op16_add
         | (op16_mv & ~dly16_slli_setrd)
