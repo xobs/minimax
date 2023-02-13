@@ -263,32 +263,36 @@ module minimax (
   assign regS = bS_banksel ? regS_uc : regS_ex;
   assign regD = bD_banksel ? regD_uc : regD_ex;
 
-  minimax_rf regfile_execution (
+  RAM32_1RW1R regfile_execution (
 `ifdef USE_POWER_PINS
-    .vdd(vdd),
-    .vss(vss),
+    .VDD(vdd),
+    .VSS(vss),
 `endif
-    .clk(clk),
-    .addrS(addrS_port),
-    .addrD(addrD_port),
-    .new_value(aluX),
-    .we(wb & ~bD_banksel),
-    .rS(regS_ex),
-    .rD(regD_ex)
+    .CLK(clk),
+    .EN0(1'b1),
+    .EN1(1'b1),
+    .A0(addrD_port),
+    .A1(addrS_port),
+    .Di0(aluX),
+    .Do0(regD_ex),
+    .Do1(regS_ex),
+    .WE0({4{wb & ~bD_banksel}})
   );
 
-  minimax_rf regfile_microcode (
+  RAM32_1RW1R regfile_microcode (
 `ifdef USE_POWER_PINS
-    .vdd(vdd),
-    .vss(vss),
+    .VDD(vdd),
+    .VSS(vss),
 `endif
-    .clk(clk),
-    .addrS(addrS_port),
-    .addrD(addrD_port),
-    .new_value(aluX),
-    .we(wb & bD_banksel),
-    .rS(regS_uc),
-    .rD(regD_uc)
+    .CLK(clk),
+    .EN0(1'b1),
+    .EN1(1'b1),
+    .A0(addrD_port),
+    .A1(addrS_port),
+    .Di0(aluX),
+    .Do0(regD_uc),
+    .Do1(regS_uc),
+    .WE0({4{wb & bD_banksel}})
   );
 
   assign aluA = (regD & {32{op16_add | op16_addi | op16_sub

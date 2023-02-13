@@ -1,5 +1,9 @@
 // Tie 
 module gf180mcu_sram_512x32(
+`ifdef USE_POWER_PINS
+    inout vdd,	// User area 1 1.8V supply
+    inout vss,	// User area 1 digital ground
+`endif
     input  clk,
     input  reset,
     input  en,
@@ -29,8 +33,8 @@ module gf180mcu_sram_512x32(
 
     gf180mcu_fd_ip_sram__sram512x8m8wm1 ram1 (
 `ifdef USE_POWER_PINS
-        .VDD(1'b1),
-        .VSS(1'b0),
+        .VDD(vdd),
+        .VSS(vss),
 `endif
         .CLK(clk),
         .CEN(cen),
@@ -43,8 +47,8 @@ module gf180mcu_sram_512x32(
 
     gf180mcu_fd_ip_sram__sram512x8m8wm1 ram2 (
 `ifdef USE_POWER_PINS
-        .VDD(1'b1),
-        .VSS(1'b0),
+        .VDD(vdd),
+        .VSS(vss),
 `endif
         .CLK(clk),
         .CEN(cen),
@@ -57,8 +61,8 @@ module gf180mcu_sram_512x32(
 
     gf180mcu_fd_ip_sram__sram512x8m8wm1 ram3 (
 `ifdef USE_POWER_PINS
-        .VDD(1'b1),
-        .VSS(1'b0),
+        .VDD(vdd),
+        .VSS(vss),
 `endif
         .CLK(clk),
         .CEN(cen),
@@ -71,8 +75,8 @@ module gf180mcu_sram_512x32(
 
     gf180mcu_fd_ip_sram__sram512x8m8wm1 ram4 (
 `ifdef USE_POWER_PINS
-        .VDD(1'b1),
-        .VSS(1'b0),
+        .VDD(vdd),
+        .VSS(vss),
 `endif
         .CLK(clk),
         .CEN(cen),

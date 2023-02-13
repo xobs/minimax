@@ -74,31 +74,31 @@ module minimax_tb;
         `endif
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank0.ram1.mem[i] = rom_array[i * 2] >> 0;
-            bank0.ram2.mem[i] = rom_array[i * 2] >> 8;
-            bank0.ram3.mem[i] = rom_array[i * 2 + 1] >> 0;
-            bank0.ram4.mem[i] = rom_array[i * 2 + 1] >> 8;
+            bank1.ram1.mem[i] = rom_array[i * 2] >> 0;
+            bank1.ram2.mem[i] = rom_array[i * 2] >> 8;
+            bank1.ram3.mem[i] = rom_array[i * 2 + 1] >> 0;
+            bank1.ram4.mem[i] = rom_array[i * 2 + 1] >> 8;
         end
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank1.ram1.mem[i] = rom_array[1024 + i * 2] >> 0;
-            bank1.ram2.mem[i] = rom_array[1024 + i * 2] >> 8;
-            bank1.ram3.mem[i] = rom_array[1024 + i * 2 + 1] >> 0;
-            bank1.ram4.mem[i] = rom_array[1024 + i * 2 + 1] >> 8;
+            bank2.ram1.mem[i] = rom_array[1024 + i * 2] >> 0;
+            bank2.ram2.mem[i] = rom_array[1024 + i * 2] >> 8;
+            bank2.ram3.mem[i] = rom_array[1024 + i * 2 + 1] >> 0;
+            bank2.ram4.mem[i] = rom_array[1024 + i * 2 + 1] >> 8;
         end
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank2.ram1.mem[i] = rom_array[2*1024 + i * 2] >> 0;
-            bank2.ram2.mem[i] = rom_array[2*1024 + i * 2] >> 8;
-            bank2.ram3.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 0;
-            bank2.ram4.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 8;
+            bank3.ram1.mem[i] = rom_array[2*1024 + i * 2] >> 0;
+            bank3.ram2.mem[i] = rom_array[2*1024 + i * 2] >> 8;
+            bank3.ram3.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 0;
+            bank3.ram4.mem[i] = rom_array[2*1024 + i * 2 + 1] >> 8;
         end
 
         for (i = 0; i < 512; i = i + 1) begin
-            bank3.ram1.mem[i] = rom_array[3*1024 + i * 2] >> 0;
-            bank3.ram2.mem[i] = rom_array[3*1024 + i * 2] >> 8;
-            bank3.ram3.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 0;
-            bank3.ram4.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 8;
+            bank4.ram1.mem[i] = rom_array[3*1024 + i * 2] >> 0;
+            bank4.ram2.mem[i] = rom_array[3*1024 + i * 2] >> 8;
+            bank4.ram3.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 0;
+            bank4.ram4.mem[i] = rom_array[3*1024 + i * 2 + 1] >> 8;
         end
 
         forever begin
@@ -148,55 +148,55 @@ module minimax_tb;
     );
 
     assign rdata =
-          (rdata_bank0 & {32{(ram_addr[12:11] == 2'h0)}})
-        | (rdata_bank1 & {32{(ram_addr[12:11] == 2'h1)}})
-        | (rdata_bank2 & {32{(ram_addr[12:11] == 2'h2)}})
-        | (rdata_bank3 & {32{(ram_addr[12:11] == 2'h3)}});
+          (rdata_bank1 & {32{(ram_addr[12:11] == 2'h0)}})
+        | (rdata_bank2 & {32{(ram_addr[12:11] == 2'h1)}})
+        | (rdata_bank3 & {32{(ram_addr[12:11] == 2'h2)}})
+        | (rdata_bank4 & {32{(ram_addr[12:11] == 2'h3)}});
 
     // Bytes 0-2047
-    wire [31:0] rdata_bank0;
-    gf180mcu_sram_512x32 bank0 (
-        .clk(bank_clk),
-        .reset(mem_reset),
-        .en(ram_addr[12:11] == 2'h0),
-        .addr(ram_addr[10:2]),
-        .rdata(rdata_bank0),
-        .wdata(wdata),
-        .wen(wmask == 4'hf)
-    );
-
-    // Bytes 2048-4097
     wire [31:0] rdata_bank1;
     gf180mcu_sram_512x32 bank1 (
         .clk(bank_clk),
         .reset(mem_reset),
-        .en(ram_addr[12:11] == 2'h1),
+        .en(ram_addr[12:11] == 2'h0),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank1),
         .wdata(wdata),
         .wen(wmask == 4'hf)
     );
 
-    // Bytes 4098-6143
+    // Bytes 2048-4097
     wire [31:0] rdata_bank2;
     gf180mcu_sram_512x32 bank2 (
         .clk(bank_clk),
         .reset(mem_reset),
-        .en(ram_addr[12:11] == 2'h2),
+        .en(ram_addr[12:11] == 2'h1),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank2),
         .wdata(wdata),
         .wen(wmask == 4'hf)
     );
 
-    // Bytes 6144-8191
+    // Bytes 4098-6143
     wire [31:0] rdata_bank3;
     gf180mcu_sram_512x32 bank3 (
         .clk(bank_clk),
         .reset(mem_reset),
-        .en(ram_addr[12:11] == 2'h3),
+        .en(ram_addr[12:11] == 2'h2),
         .addr(ram_addr[10:2]),
         .rdata(rdata_bank3),
+        .wdata(wdata),
+        .wen(wmask == 4'hf)
+    );
+
+    // Bytes 6144-8191
+    wire [31:0] rdata_bank4;
+    gf180mcu_sram_512x32 bank4 (
+        .clk(bank_clk),
+        .reset(mem_reset),
+        .en(ram_addr[12:11] == 2'h3),
+        .addr(ram_addr[10:2]),
+        .rdata(rdata_bank4),
         .wdata(wdata),
         .wen(wmask == 4'hf)
     );
