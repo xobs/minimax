@@ -62,8 +62,6 @@ $(TESTS): dirs $$@/pass $$@/pass.verilog
 			../../rtl/RAM32_1RW1R.v \
 			../../rtl/gf180mcu_sram_512x32.v \
 			../../rtl/gf180mcu_fd_ip_sram__sram512x8m8wm1.v \
-			$(PDK_ROOT)/gf180mcuC/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v \
-			$(PDK_ROOT)/gf180mcuC/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/primitives.v \
 		&& \
 		$(VVP) -N ./test-harness.vvp > log.verilog.raw
 # Massage the resulting error output so that it looks similar to fusesoc output
