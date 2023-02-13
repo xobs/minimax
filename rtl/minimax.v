@@ -104,7 +104,7 @@ module minimax (
 
   assign inst_type_masked     = inst & 16'b111_0_00000_00000_11;
   assign inst_type_masked_i16 = inst & 16'b111_0_11111_00000_11;
-  assign inst_type_masked_sr  = inst & 16'b111_1_11000_11111_11;
+  assign inst_type_masked_sr  = inst & 16'b111_1_11000_00000_11;
   assign inst_type_masked_and = inst & 16'b111_0_11000_00000_11;
   assign inst_type_masked_op  = inst & 16'b111_0_11000_11000_11;
   assign inst_type_masked_j   = inst & 16'b111_1_00000_11111_11;
@@ -120,9 +120,8 @@ module minimax (
   assign op16_li         = (inst_type_masked     == 16'b010_0_00000_00000_01) & ~bubble;
   assign op16_addi16sp   = (inst_type_masked_i16 == 16'b011_0_00010_00000_01) & ~bubble;
   assign op16_lui        = (inst_type_masked     == 16'b011_0_00000_00000_01) & ~bubble & ~op16_addi16sp;
-      
-  assign op16_srli       = (inst_type_masked_sr  == 16'b100_0_00000_00001_01) & ~bubble;
-  assign op16_srai       = (inst_type_masked_sr  == 16'b100_0_01000_00001_01) & ~bubble;
+  assign op16_srli       = (inst_type_masked_sr  == 16'b100_0_00000_00000_01) & ~bubble;
+  assign op16_srai       = (inst_type_masked_sr  == 16'b100_0_01000_00000_01) & ~bubble;
   assign op16_andi       = (inst_type_masked_and == 16'b100_0_10000_00000_01) & ~bubble;
   assign op16_sub        = (inst_type_masked_op  == 16'b100_0_11000_00000_01) & ~bubble;
   assign op16_xor        = (inst_type_masked_op  == 16'b100_0_11000_01000_01) & ~bubble;
